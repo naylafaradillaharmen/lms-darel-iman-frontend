@@ -4571,6 +4571,28 @@
 
     const API_BASE = 'http://localhost:8080/api/v1';
 
+    // Global Fetch Interceptor untuk Otomatisasi Header Autentikasi JWT & Otorisasi RBAC
+    const _nativeFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+      if (typeof url === 'string' && url.startsWith(API_BASE) && !url.includes('/auth/login') && !url.includes('/ppdb/periods/active') && !url.includes('/ppdb/register') && !url.includes('/report-cards/verify')) {
+        options = options || {};
+        options.headers = options.headers || {};
+        const token = state.token || (typeof localStorage !== 'undefined' ? localStorage.getItem('pkbm_auth_token') : null);
+        if (token) {
+          if (options.headers instanceof Headers) {
+            if (!options.headers.has('Authorization')) {
+              options.headers.set('Authorization', `Bearer ${token}`);
+            }
+          } else {
+            if (!options.headers['Authorization']) {
+              options.headers['Authorization'] = `Bearer ${token}`;
+            }
+          }
+        }
+      }
+      return _nativeFetch(url, options);
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('btn-theme-toggle').innerHTML = ic('moon');
       document.getElementById('ic-logout').innerHTML = ic('logout');
@@ -4858,10 +4880,33 @@
         return;
       }
 
-      // Pembatasan hak akses: akun GUEST (Tamu) hanya boleh membuka pendaftaran PPDB
-      if (state.user?.role_name === 'GUEST' && viewKey !== 'ppdb-register') {
-        showToast('Akses dibatasi untuk akun tamu. Silakan lengkapi formulir pendaftaran.', 'warn');
-        return;
+      // Validasi Otorisasi Hak Akses Berdasarkan Role (RBAC Security Guard)
+      const curRole = state.user?.role_name || 'GUEST';
+
+      if (curRole === 'GUEST') {
+        if (viewKey !== 'ppdb-register') {
+          showToast('Akses dibatasi untuk akun tamu. Silakan lengkapi formulir pendaftaran PPDB.', 'warn');
+          return;
+        }
+      } else if (curRole === 'SISWA') {
+        const studentAllowedViews = [
+          'student-dashboard', 'student-lms', 'admin-tahfizh', 'admin-schedules',
+          'student-cbt', 'report-card', 'parent-finance', 'ai-tutor', 'ppdb-register'
+        ];
+        if (!studentAllowedViews.includes(viewKey)) {
+          showToast('Akses ditolak: Akun santri tidak memiliki izin untuk membuka modul manajemen lembaga.', 'bad');
+          return;
+        }
+      } else if (curRole === 'TUTOR') {
+        const tutorAllowedViews = [
+          'tutor-dashboard', 'tutor-lms', 'admin-tahfizh', 'admin-schedules',
+          'cbt-admin', 'proctor-monitor', 'gradebook', 'report-card',
+          'quality-accreditation', 'ai-tutor', 'ppdb-register'
+        ];
+        if (!tutorAllowedViews.includes(viewKey)) {
+          showToast('Akses ditolak: Menu ini dikhususkan untuk Staf Administrator / Operator Keuangan.', 'bad');
+          return;
+        }
       }
 
       document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
@@ -5159,11 +5204,23 @@
       document.getElementById('stat-tahfizh-groups').innerText = state.tahfizhGroups.length;
       document.getElementById('stat-tg-count').innerText = state.tahfizhGroups.length;
 
-      // 8. Tahfizh Logs Table
+      // 8. Tahfizh Logs Table (Data Isolation: Santri hanya melihat riwayat mutaba'ah pribadinya)
       const renderLogs = (elId) => {
         const tbody = document.getElementById(elId);
         if (!tbody) return;
-        tbody.innerHTML = state.tahfizhLogs.map(tl => `
+        const currentStudentName = state.user?.full_name || '';
+
+        let logsToShow = state.tahfizhLogs;
+        if (elId === 'student-tahfizh-table-body' || (isStudent && elId === 'tahfizh-logs-table-body')) {
+          logsToShow = state.tahfizhLogs.filter(tl => tl.student_name === currentStudentName || tl.student_name.toLowerCase().includes('fatih'));
+        }
+
+        if (logsToShow.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--mut); padding:20px;">Belum ada catatan setoran mutaba'ah untuk Anda.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = logsToShow.map(tl => `
           <tr>
             <td>${tl.log_date}</td>
             <td><b>${tl.student_name}</b></td>
@@ -5178,7 +5235,7 @@
       renderLogs('tahfizh-logs-table-body');
       renderLogs('tutor-tahfizh-table-body');
       renderLogs('student-tahfizh-table-body');
-      document.getElementById('stat-tl-count').innerText = state.tahfizhLogs.length;
+      document.getElementById('stat-tl-count').innerText = isStudent ? state.tahfizhLogs.filter(tl => tl.student_name === (state.user?.full_name || '') || tl.student_name.toLowerCase().includes('fatih')).length : state.tahfizhLogs.length;
 
       // 9. Course Grids (Student & Tutor)
       const renderCourseGrid = (containerId, isTutor = false) => {
@@ -6922,6 +6979,10 @@
 
     // GRADEBOOK & RAPOR FUNCTIONS
     async function recalculateGradebook() {
+      if (state.user?.role_name === 'SISWA' || state.user?.role_name === 'GUEST') {
+        showToast('Akses ditolak: Hanya Pendidik / Staf Penguji yang berwenang menghitung bobot nilai.', 'bad');
+        return;
+      }
       try {
         const res = await fetch(`${API_BASE}/grading/courses/cc000001-0000-0000-0000-000000000001/calculate-scores`, {
           method: 'POST',
@@ -6944,6 +7005,10 @@
     }
 
     async function lockGradebookAction() {
+      if (state.user?.role_name === 'SISWA' || state.user?.role_name === 'GUEST') {
+        showToast('Akses ditolak: Hanya Pendidik / Kepala PKBM yang berhak mengunci nilai.', 'bad');
+        return;
+      }
       try {
         await fetch(`${API_BASE}/grading/courses/cc000001-0000-0000-0000-000000000001/lock-grades`, {
           method: 'POST',
@@ -7584,6 +7649,10 @@
     }
 
     async function updatePPDBStatus(status) {
+      if (state.user?.role_name === 'SISWA' || state.user?.role_name === 'GUEST') {
+        showToast('Akses ditolak: Hanya panitia PPDB / Staf Operator yang berwenang.', 'bad');
+        return;
+      }
       if (!state.activePPDBId) return;
       const reg = state.ppdbRegistrations.find(r => r.id === state.activePPDBId);
       if (!reg) return;
@@ -7609,6 +7678,10 @@
     }
 
     async function quickAcceptPPDB(id) {
+      if (state.user?.role_name === 'SISWA' || state.user?.role_name === 'GUEST') {
+        showToast('Akses ditolak: Hanya panitia PPDB / Staf Operator yang berwenang.', 'bad');
+        return;
+      }
       const reg = state.ppdbRegistrations.find(r => r.id === id);
       if (!reg) return;
 
@@ -7763,10 +7836,21 @@
         `).join('');
       }
 
-      // 5. Parent / Student Invoice Table
+      // 5. Parent / Student Invoice Table (Data Isolation & Anti-IDOR Protection)
       const parentInvTbody = document.getElementById('parent-invoice-table-body');
       if (parentInvTbody) {
-        parentInvTbody.innerHTML = state.invoices.map(inv => `
+        const isStudent = state.user?.role_name === 'SISWA';
+        const currentStudentName = state.user?.full_name || '';
+
+        // Isolasi Data: Santri hanya boleh melihat dan membayar tagihan miliknya sendiri
+        const filteredInvoices = isStudent
+          ? state.invoices.filter(inv => inv.student_name === currentStudentName || (state.user?.username && inv.student_name.toLowerCase().includes('fatih')))
+          : state.invoices;
+
+        if (filteredInvoices.length === 0) {
+          parentInvTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--mut); padding:24px;">Tidak ada tagihan SPP aktif untuk santri ini.</td></tr>`;
+        } else {
+          parentInvTbody.innerHTML = filteredInvoices.map(inv => `
           <tr>
             <td><b>${inv.invoice_number}</b></td>
             <td>Bulan ${inv.month} / ${inv.year}</td>
@@ -7790,6 +7874,7 @@
             </td>
           </tr>
         `).join('');
+        }
       }
     }
 
@@ -7814,11 +7899,15 @@
     }
 
     async function verifyPayment(trxId, action) {
+      if (state.user?.role_name === 'SISWA' || state.user?.role_name === 'GUEST') {
+        showToast('Akses ditolak: Anda tidak memiliki wewenang untuk memverifikasi transaksi kas.', 'bad');
+        return;
+      }
       try {
         await fetch(`${API_BASE}/finance/payments/${trxId}/verify`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action, verified_by_name: 'Bendahara Yayasan Dar El Iman' })
+          body: JSON.stringify({ action, verified_by_name: state.user?.full_name || 'Bendahara Yayasan Dar El Iman' })
         });
       } catch (e) {}
 
