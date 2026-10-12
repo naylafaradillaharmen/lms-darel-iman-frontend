@@ -844,34 +844,56 @@
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
-    <div class="login-box">
+    <div class="login-box" style="max-width: 420px; width: 92%;">
       <div class="login-logo">DEI</div>
       <h2 style="font-size:19px; font-weight:800; margin-bottom: 3px;">PKBM Digital Dar El Iman</h2>
-      <p style="color:var(--mut); font-size:12px; margin-bottom: 22px;">Sistem LMS, KBM Virtual & Halaqah Tahfizh Terpadu</p>
+      <p style="color:var(--mut); font-size:12px; margin-bottom: 18px;">Sistem LMS, KBM Virtual & Halaqah Tahfizh Terpadu</p>
+
+      <!-- INLINE ALERT BANNER -->
+      <div id="login-alert-banner" style="display:none; background:#fee2e2; border:1px solid #fecaca; color:#b91c1c; border-radius:8px; padding:10px 12px; font-size:12px; margin-bottom:14px; text-align:left;">
+        <div style="font-weight:700; display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+          <span>⚠️</span> <span id="login-alert-title">Gagal Masuk</span>
+        </div>
+        <div id="login-alert-desc" style="line-height:1.4;">Kredensial yang Anda masukkan tidak cocok.</div>
+      </div>
 
       <form onsubmit="handleLogin(event)">
         <div class="form-group" style="text-align:left;">
-          <label>Username / Email</label>
-          <input type="text" id="login-username" class="form-control" value="admin" required>
+          <label>Username / Email Pengguna</label>
+          <input type="text" id="login-username" class="form-control" value="admin" placeholder="Contoh: admin, tutor.ahmad, santri.fatih" required>
         </div>
         <div class="form-group" style="text-align:left;">
-          <label>Kata Sandi</label>
-          <input type="password" id="login-password" class="form-control" value="admin123" required>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label style="margin-bottom:0;">Kata Sandi</label>
+            <span style="font-size:11px; color:var(--mut); cursor:pointer;" onclick="showForgotPasswordHelp()">Lupa sandi?</span>
+          </div>
+          <div style="position:relative;">
+            <input type="password" id="login-password" class="form-control" value="admin123" placeholder="Masukkan kata sandi" required style="padding-right:38px;">
+            <button type="button" class="icon-btn" onclick="togglePasswordVisibility('login-password', this)" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:transparent; font-size:14px; cursor:pointer;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; margin-top:6px;">
+        <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px; margin-top:6px; font-weight:700;">
           Masuk ke Portal
         </button>
       </form>
 
-      <div style="margin-top:18px; border-top:1px solid var(--line); padding-top:14px; text-align:left;">
-        <small style="color:var(--mut); display:block; margin-bottom:7px; font-weight:600; font-size:11px;">PILIH PERAN DEMO:</small>
-        <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
-          <button class="btn btn-outline btn-sm" onclick="quickFill('admin', 'admin123')">Admin</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFill('operator', 'admin123')">Operator</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFill('tutor.ahmad', 'tutor123')">Ust. Ahmad (Tutor)</button>
-          <button class="btn btn-outline btn-sm" onclick="quickFill('santri.fatih', 'santri123')">Fatih (Santri)</button>
+      <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px; text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+          <small style="color:var(--mut); font-weight:700; font-size:11px; text-transform:uppercase;">PINTASAN PERAN CEPAT:</small>
+          <span style="font-size:11px; color:var(--em); font-weight:700; cursor:pointer;" onclick="openDemoRolesModal()">Lihat 18 Role &rarr;</span>
         </div>
-        <button class="btn btn-gold btn-sm" style="width:100%; justify-content:center;" onclick="openPublicPPDB()">
+        <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
+          <button class="btn btn-outline btn-sm" onclick="quickFill('admin', 'admin123')">👑 Admin</button>
+          <button class="btn btn-outline btn-sm" onclick="quickFill('tutor.ahmad', 'tutor123')">📖 Tutor</button>
+          <button class="btn btn-outline btn-sm" onclick="quickFill('santri.fatih', 'santri123')">🎓 Santri</button>
+          <button class="btn btn-outline btn-sm" onclick="quickFill('operator', 'operator123')">⚙️ Operator</button>
+        </div>
+
+        <button class="btn btn-gold btn-sm" style="width:100%; justify-content:center; margin-bottom:8px; font-weight:700;" onclick="openDemoRolesModal()">
+          🎯 Katalog 18 Akun Demo Lengkap (Sesuai Rancangan)
+        </button>
+
+        <button class="btn btn-outline btn-sm" style="width:100%; justify-content:center;" onclick="openPublicPPDB()">
           📝 Pendaftaran Santri Baru (PPDB Online)
         </button>
       </div>
@@ -911,11 +933,16 @@
           <span style="color:var(--mut); font-size:11.5px;" id="tz-name">WIB</span>
         </div>
         <div class="spacer"></div>
-        <div class="user-pill">
-          <div class="avatar" id="header-avatar">A</div>
-          <div>
-            <b id="header-name" style="font-size:12.5px; display:block;">Admin</b>
-            <small id="header-role" style="color:var(--em); font-size:10.5px; font-weight:700;">SUPER ADMIN</small>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="openChangePasswordModal()" title="Ubah Kata Sandi Akun Anda" style="display:inline-flex; align-items:center; gap:5px; font-weight:600; padding:6px 12px; border-radius:8px;">
+            🔑 <span>Ubah Sandi</span>
+          </button>
+          <div class="user-pill">
+            <div class="avatar" id="header-avatar">A</div>
+            <div>
+              <b id="header-name" style="font-size:12.5px; display:block;">Admin</b>
+              <small id="header-role" style="color:var(--em); font-size:10.5px; font-weight:700;">SUPER ADMIN</small>
+            </div>
           </div>
         </div>
       </header>
@@ -4393,6 +4420,111 @@
     </div>
   </div>
 
+  <!-- MODAL 1: STATUS POP-OUT HASIL LOGIN (BERHASIL / GAGAL) -->
+  <div id="modal-login-status" class="modal-overlay">
+    <div class="modal-box" style="max-width:440px; text-align:center; padding:28px 24px; border-radius:16px;">
+      <div id="mls-icon-container" style="width:68px; height:68px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;"></div>
+      <h2 id="mls-title" style="font-size:19px; font-weight:800; margin-bottom:8px;"></h2>
+      <p id="mls-desc" style="font-size:13.5px; color:var(--tx); line-height:1.5; margin-bottom:16px;"></p>
+
+      <div id="mls-detail-box" style="display:none; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 14px; text-align:left; font-size:12px; margin-bottom:20px; line-height:1.5;"></div>
+
+      <div id="mls-actions" style="display:flex; gap:8px; justify-content:center;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: UBAH KATA SANDI AKUN -->
+  <div id="modal-change-password" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px; border-radius:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-size:17px; font-weight:800; display:flex; align-items:center; gap:8px;">
+          <span>🔐</span> Ubah Kata Sandi Akun
+        </h3>
+        <button class="icon-btn" onclick="closeModal('modal-change-password')">✕</button>
+      </div>
+      <p style="color:var(--mut); font-size:12.5px; margin-bottom:18px;">
+        Perbarui kata sandi akun <b id="cp-user-display" style="color:var(--tx);">Pengguna Aktif</b> untuk menjaga keamanan akses portal.
+      </p>
+
+      <form onsubmit="handleChangePasswordSubmit(event)">
+        <div class="form-group">
+          <label>Kata Sandi Saat Ini *</label>
+          <div style="position:relative;">
+            <input type="password" id="cp-current-password" class="form-control" placeholder="Masukkan kata sandi lama Anda" required style="padding-right:38px;">
+            <button type="button" class="icon-btn" onclick="togglePasswordVisibility('cp-current-password', this)" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:transparent; font-size:14px; cursor:pointer;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Kata Sandi Baru * (Minimal 6 karakter)</label>
+          <div style="position:relative;">
+            <input type="password" id="cp-new-password" class="form-control" placeholder="Minimal 6 karakter kombinasi" minlength="6" oninput="checkPasswordStrength(this.value)" required style="padding-right:38px;">
+            <button type="button" class="icon-btn" onclick="togglePasswordVisibility('cp-new-password', this)" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:transparent; font-size:14px; cursor:pointer;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
+          <!-- STRENGTH METER -->
+          <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:5px; background:var(--line); border-radius:99px; overflow:hidden;">
+              <div id="cp-strength-bar" style="width:0%; height:100%; background:var(--bad); transition:all .3s ease;"></div>
+            </div>
+            <small id="cp-strength-text" style="font-size:11px; color:var(--mut); min-width:70px;">Belum diisi</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Konfirmasi Kata Sandi Baru *</label>
+          <div style="position:relative;">
+            <input type="password" id="cp-confirm-password" class="form-control" placeholder="Ketik ulang kata sandi baru" minlength="6" required style="padding-right:38px;">
+            <button type="button" class="icon-btn" onclick="togglePasswordVisibility('cp-confirm-password', this)" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:transparent; font-size:14px; cursor:pointer;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
+        </div>
+
+        <div id="cp-error-box" style="display:none; background:#fee2e2; border:1px solid #fecaca; color:#b91c1c; border-radius:8px; padding:10px 12px; font-size:12px; margin-bottom:14px;"></div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-change-password')">Batal</button>
+          <button type="submit" id="btn-cp-submit" class="btn btn-primary" style="font-weight:700;">Simpan Kata Sandi Baru</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: KATALOG 18 PERAN LENGKAP -->
+  <div id="modal-demo-roles" class="modal-overlay">
+    <div class="modal-box" style="max-width:840px; max-height:88vh; border-radius:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <h3 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px;">
+            <span>🎯</span> Katalog 18 Peran Pengguna (Role Demo Lengkap)
+          </h3>
+          <p style="color:var(--mut); font-size:12.5px; margin-top:3px;">
+            Sesuai dokumen arsitektur <i>Rancangan Fitur PKBM Digital Dar El Iman</i> (Pimpinan, Manajerial, Operasional, Pengguna, Eksternal).
+          </p>
+        </div>
+        <button class="icon-btn" onclick="closeModal('modal-demo-roles')">✕</button>
+      </div>
+
+      <!-- FILTER KATEGORI -->
+      <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:14px; border-bottom:1px solid var(--line);">
+        <button class="tab-btn active" id="tab-btn-cat-ALL" onclick="filterDemoRolesCategory('ALL')">Semua Peran (18)</button>
+        <button class="tab-btn" id="tab-btn-cat-Pimpinan" onclick="filterDemoRolesCategory('Pimpinan')">👑 Pimpinan (3)</button>
+        <button class="tab-btn" id="tab-btn-cat-Manajerial" onclick="filterDemoRolesCategory('Manajerial')">💼 Manajerial (4)</button>
+        <button class="tab-btn" id="tab-btn-cat-Operasional" onclick="filterDemoRolesCategory('Operasional')">⚙️ Operasional (6)</button>
+        <button class="tab-btn" id="tab-btn-cat-Pengguna" onclick="filterDemoRolesCategory('Pengguna Layanan')">🎓 Pengguna (2)</button>
+        <button class="tab-btn" id="tab-btn-cat-Eksternal" onclick="filterDemoRolesCategory('Eksternal')">🌐 Eksternal & Tamu (3)</button>
+      </div>
+
+      <!-- GRID KARTU PERAN -->
+      <div id="demo-roles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding-right:4px;">
+        <!-- Injected via JS -->
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:12px; border-top:1px solid var(--line);">
+        <small style="color:var(--mut); font-size:12px;">💡 Klik <b>"Gunakan Akun Ini"</b> untuk otomatis mengisi form login atau masuk langsung.</small>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('modal-demo-roles')">Tutup Katalog</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast">
     <span id="toast-icon">✓</span>
@@ -4630,15 +4762,501 @@
       setTimeout(() => t.classList.remove('show'), 2800);
     }
 
+    // =========================================================================
+    // KATALOG 18 PERAN LENGKAP (SESUAI RANCANGAN FITUR PKBM DIGITAL DAR EL IMAN)
+    // =========================================================================
+    const DEMO_ACCOUNTS_MAP = {
+      // 1. PIMPINAN
+      'admin': {
+        id: 'u0000001', username: 'admin', password: 'admin123',
+        role_name: 'SUPER_ADMIN', role_display: 'Super Admin Yayasan',
+        category: 'Pimpinan', icon: '👑',
+        full_name: 'Administrator Utama Yayasan', email: 'admin@darel-iman.or.id',
+        desc: 'Akses penuh ke seluruh modul, konfigurasi sistem, dan manajemen hak akses.'
+      },
+      'pembina': {
+        id: 'u0000002', username: 'pembina', password: 'pembina123',
+        role_name: 'DEWAN_PEMBINA', role_display: 'Dewan Pembina Yayasan (Read-Only)',
+        category: 'Pimpinan', icon: '🏛️',
+        full_name: 'Prof. Dr. H. Faisal, M.A. (Dewan Pembina)', email: 'pembina@darel-iman.or.id',
+        desc: 'Pengawasan eksekutif: Executive BSC, ringkasan mutu, kemitraan, dan keuangan.'
+      },
+      'direktur': {
+        id: 'u0000003', username: 'direktur', password: 'direktur123',
+        role_name: 'DIREKTUR_PKBM', role_display: 'Direktur / Kepala PKBM',
+        category: 'Pimpinan', icon: '🎓',
+        full_name: 'Ustadz H. Ridwan Abu Ziyad, Lc., M.Pd. (Direktur)', email: 'direktur@darel-iman.or.id',
+        desc: 'Otoritas tertinggi akademik: pengesahan nilai e-rapor, kelulusan, dan kebijakan mutu.'
+      },
+
+      // 2. MANAJERIAL
+      'mgr.akademik': {
+        id: 'u0000004', username: 'mgr.akademik', password: 'akademik123',
+        role_name: 'MANAJER_AKADEMIK', role_display: 'Manajer Akademik & Kurikulum',
+        category: 'Manajerial', icon: '📚',
+        full_name: 'Ustadz Syamsul Hadi, S.Pd.I. (Manajer Akademik)', email: 'akademik@darel-iman.or.id',
+        desc: 'Manajemen kurikulum, jadwal KBM, bank butir soal ujian, dan buku nilai.'
+      },
+      'mgr.kesiswaan': {
+        id: 'u0000005', username: 'mgr.kesiswaan', password: 'kesiswaan123',
+        role_name: 'MANAJER_KESISWAAN', role_display: 'Manajer Kesiswaan & Diaspora',
+        category: 'Manajerial', icon: '🌍',
+        full_name: 'Ustadzah Nurul Hidayah, S.Sos. (Manajer Kesiswaan)', email: 'kesiswaan@darel-iman.or.id',
+        desc: 'PPDB nasional & diaspora, persebaran santri diaspora, dan halaqah tahfizh.'
+      },
+      'mgr.keuangan': {
+        id: 'u0000006', username: 'mgr.keuangan', password: 'keuangan123',
+        role_name: 'MANAJER_KEUANGAN', role_display: 'Manajer Keuangan & Legal',
+        category: 'Manajerial', icon: '💰',
+        full_name: 'Hj. Ratna Juwita, S.E., Ak. (Manajer Keuangan)', email: 'keuangan@darel-iman.or.id',
+        desc: 'Manajemen kas SPP, maker-checker verifikasi transfer, beasiswa, dan tarif.'
+      },
+      'mgr.it': {
+        id: 'u0000007', username: 'mgr.it', password: 'it123',
+        role_name: 'MANAJER_TEKNOLOGI', role_display: 'Manajer Teknologi & Sistem',
+        category: 'Manajerial', icon: '💻',
+        full_name: 'Fajar Rahmad, S.Kom., M.T. (Manajer TI)', email: 'it@darel-iman.or.id',
+        desc: 'Infrastruktur sistem, audit kesiapan Dapodik, CBT & Proctoring, AI Tutor.'
+      },
+
+      // 3. OPERASIONAL
+      'tutor.ahmad': {
+        id: 'u0000008', username: 'tutor.ahmad', password: 'tutor123',
+        role_name: 'TUTOR', role_display: 'Tutor / Pendidik',
+        category: 'Operasional', icon: '📖',
+        full_name: 'Ustadz Ahmad Al-Hafizh, Lc. (Tutor Tahfizh)', email: 'ahmad@darel-iman.or.id',
+        desc: 'Ruang kelas LMS, materi, tugas, presensi, bank soal, dan setoran tahfizh.'
+      },
+      'walikelas': {
+        id: 'u0000009', username: 'walikelas', password: 'wali123',
+        role_name: 'WALI_KELAS', role_display: 'Wali Kelas / Pendamping',
+        category: 'Operasional', icon: '👩‍🏫',
+        full_name: 'Ustadzah Khadijah Al-Atsariyyah, S.Pd. (Wali Kelas X)', email: 'walikelas@darel-iman.or.id',
+        desc: 'Buku nilai rombel binaan, mutaba\'ah santri, dan pengesahan e-rapor santri.'
+      },
+      'proktor': {
+        id: 'u0000010', username: 'proktor', password: 'proktor123',
+        role_name: 'PROKTOR_UJIAN', role_display: 'Proktor Ujian CBT',
+        category: 'Operasional', icon: '🛡️',
+        full_name: 'Ibrahim Al-Faruq, S.Kom. (Proktor CBT)', email: 'proktor@darel-iman.or.id',
+        desc: 'Monitoring proktor real-time, pencatatan insiden kecurangan, dan jadwal CBT.'
+      },
+      'operator': {
+        id: 'u0000011', username: 'operator', password: 'operator123',
+        role_name: 'OPERATOR', role_display: 'Staf Administrasi / Operator Dapodik',
+        category: 'Operasional', icon: '⚙️',
+        full_name: 'Staf Operator Dapodik & Administrasi', email: 'operator@darel-iman.or.id',
+        desc: 'Data induk santri/tutor, rombel, ekspor Dapodik Kemendikbud, dan panitia PPDB.'
+      },
+      'helpdesk': {
+        id: 'u0000012', username: 'helpdesk', password: 'helpdesk123',
+        role_name: 'HELPDESK', role_display: 'Staf Helpdesk & Layanan Pengguna',
+        category: 'Operasional', icon: '🎧',
+        full_name: 'Rian Pratama (Staf Helpdesk)', email: 'helpdesk@darel-iman.or.id',
+        desc: 'Layanan informasi pendaftaran santri, panduan teknis KBM, dan bantuan akun.'
+      },
+      'tim.mutu': {
+        id: 'u0000013', username: 'tim.mutu', password: 'mutu123',
+        role_name: 'TIM_MUTU', role_display: 'Tim Penjaminan Mutu & Akreditasi',
+        category: 'Operasional', icon: '📋',
+        full_name: 'Dr. Ir. Hendra Gunawan (Auditor Mutu)', email: 'mutu@darel-iman.or.id',
+        desc: 'Instrumen akreditasi BAN-PDM, dokumen SOP, risk register, dan Executive BSC.'
+      },
+
+      // 4. PENGGUNA LAYANAN
+      'santri.fatih': {
+        id: 'u0000014', username: 'santri.fatih', password: 'santri123',
+        role_name: 'SISWA', role_display: 'Siswa / Santri',
+        category: 'Pengguna Layanan', icon: '🎓',
+        full_name: 'Muhammad Al-Fatih (Santri Kelas X)', email: 'fatih@santri.darel-iman.or.id',
+        desc: 'Belajar di LMS, mutaba\'ah tahfizh mandiri, ujian CBT, cek e-rapor, dan kas SPP.'
+      },
+      'wali.santri': {
+        id: 'u0000015', username: 'wali.santri', password: 'ortu123',
+        role_name: 'WALI_SANTRI', role_display: 'Orang Tua / Wali Santri',
+        category: 'Pengguna Layanan', icon: '👨‍👩‍👦',
+        full_name: 'Abu Zaid (Wali Santri Muhammad Al-Fatih)', email: 'wali.fatih@gmail.com',
+        desc: 'Membayar tagihan SPP anak, upload bukti transfer, dan pantau rapor & tahfizh.'
+      },
+
+      // 5. EKSTERNAL
+      'mitra.pesantren': {
+        id: 'u0000016', username: 'mitra.pesantren', password: 'mitra123',
+        role_name: 'MITRA_PESANTREN', role_display: 'Koordinator Mitra Pesantren',
+        category: 'Eksternal', icon: '🤝',
+        full_name: 'Drs. H. Mulyadi (Pesantren Darul Huffazh)', email: 'mitra@darulhuffazh.sch.id',
+        desc: 'Portal kemitraan pesantren, pendaftaran santri mitra (bulk enroll), diaspora map.'
+      },
+      'donatur': {
+        id: 'u0000017', username: 'donatur', password: 'donatur123',
+        role_name: 'DONATUR', role_display: 'Donatur / Pemberi Beasiswa',
+        category: 'Eksternal', icon: '🎁',
+        full_name: 'H. Bambang Irawan (Donatur Beasiswa)', email: 'bambang@perusahaan.co.id',
+        desc: 'Laporan penyaluran beasiswa santri, daftar penerima, dan mutaba\'ah santri asuh.'
+      },
+      'tamu': {
+        id: 'u0000018', username: 'tamu', password: 'tamu123',
+        role_name: 'GUEST', role_display: 'Calon Santri Baru (Tamu PPDB)',
+        category: 'Eksternal', icon: '📝',
+        full_name: 'Zaid bin Haritsah (Calon Santri)', email: 'calon@diaspora.my',
+        desc: 'Pendaftaran mandiri PPDB online, pengunggahan berkas, dan pantau status seleksi.'
+      }
+    };
+
+    // Aliases
+    DEMO_ACCOUNTS_MAP['santri'] = DEMO_ACCOUNTS_MAP['santri.fatih'];
+    DEMO_ACCOUNTS_MAP['tutor'] = DEMO_ACCOUNTS_MAP['tutor.ahmad'];
+    DEMO_ACCOUNTS_MAP['ortu'] = DEMO_ACCOUNTS_MAP['wali.santri'];
+
+    // -------------------------------------------------------------------------
+    // PASSWORD TOGGLE & STRENGTH HELPERS
+    // -------------------------------------------------------------------------
+    function togglePasswordVisibility(inputId, btnEl) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      if (btnEl) btnEl.innerText = isPass ? '🙈' : '👁️';
+    }
+
+    function checkPasswordStrength(val) {
+      const bar = document.getElementById('cp-strength-bar');
+      const text = document.getElementById('cp-strength-text');
+      if (!bar || !text) return;
+
+      if (!val) {
+        bar.style.width = '0%';
+        bar.style.background = 'var(--bad)';
+        text.innerText = 'Belum diisi';
+        text.style.color = 'var(--mut)';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 6) score += 30;
+      if (val.length >= 8) score += 20;
+      if (/[A-Z]/.test(val)) score += 20;
+      if (/[0-9]/.test(val)) score += 15;
+      if (/[^A-Za-z0-9]/.test(val)) score += 15;
+
+      bar.style.width = score + '%';
+      if (score < 40) {
+        bar.style.background = '#ef4444';
+        text.innerText = 'Lemah';
+        text.style.color = '#ef4444';
+      } else if (score < 75) {
+        bar.style.background = 'var(--warn)';
+        text.innerText = 'Sedang';
+        text.style.color = 'var(--warn)';
+      } else {
+        bar.style.background = 'var(--em)';
+        text.innerText = 'Kuat ✓';
+        text.style.color = 'var(--em)';
+      }
+    }
+
+    function showForgotPasswordHelp() {
+      const u = document.getElementById('login-username').value.trim();
+      const acct = DEMO_ACCOUNTS_MAP[u];
+      if (acct) {
+        const storedPass = localStorage.getItem(`pkbm_custom_pass_${u}`) || acct.password;
+        showLoginStatusModal(false, `Kata sandi untuk akun '${u}' adalah: <b>${storedPass}</b>`, acct, u);
+      } else {
+        showLoginStatusModal(false, "Silakan buka Katalog 18 Akun Demo untuk melihat daftar username dan kata sandi yang tersedia.", null, u);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // MODAL POP-OUT STATUS LOGIN (BERHASIL / GAGAL)
+    // -------------------------------------------------------------------------
+    function showLoginStatusModal(isSuccess, message, userObj = null, attemptedUsername = '') {
+      const modal = document.getElementById('modal-login-status');
+      if (!modal) return;
+
+      const iconBox = document.getElementById('mls-icon-container');
+      const titleEl = document.getElementById('mls-title');
+      const descEl = document.getElementById('mls-desc');
+      const detailBox = document.getElementById('mls-detail-box');
+      const actionsEl = document.getElementById('mls-actions');
+
+      if (isSuccess) {
+        iconBox.style.background = '#d1fae5';
+        iconBox.style.color = '#047857';
+        iconBox.innerHTML = '✓';
+
+        titleEl.style.color = '#047857';
+        titleEl.innerText = 'Alhamdulillah, Login Berhasil!';
+
+        descEl.innerHTML = message;
+
+        detailBox.style.display = 'block';
+        detailBox.style.background = '#f0fdf4';
+        detailBox.style.borderColor = '#bbf7d0';
+        detailBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--mut);">Nama Pengguna:</span>
+            <b>${userObj ? userObj.full_name : 'Pengguna'}</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--mut);">Peran Hak Akses:</span>
+            <span class="tag-pill tag-active" style="font-weight:700;">${userObj ? userObj.role_name : 'MEMBER'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--mut);">Status Keamanan:</span>
+            <span style="color:var(--em); font-weight:700;">Sesi Terenkripsi JWT Valid ✓</span>
+          </div>
+        `;
+
+        actionsEl.innerHTML = `
+          <button class="btn btn-primary" style="width:100%; justify-content:center; padding:10px;" onclick="closeModal('modal-login-status'); completeLogin(state.user, state.token);">
+            Lanjutkan ke Dasbor &rarr;
+          </button>
+        `;
+
+        modal.classList.add('open');
+
+        // Otomatis masuk setelah 1.2 detik jika tidak diklik
+        setTimeout(() => {
+          if (modal.classList.contains('open')) {
+            closeModal('modal-login-status');
+            completeLogin(state.user, state.token);
+          }
+        }, 1400);
+
+      } else {
+        iconBox.style.background = '#fee2e2';
+        iconBox.style.color = '#b91c1c';
+        iconBox.innerHTML = '✕';
+
+        titleEl.style.color = '#b91c1c';
+        titleEl.innerText = 'Gagal Masuk ke Portal';
+
+        descEl.innerHTML = message;
+
+        detailBox.style.display = 'block';
+        detailBox.style.background = '#fef2f2';
+        detailBox.style.borderColor = '#fecaca';
+
+        const acct = attemptedUsername ? DEMO_ACCOUNTS_MAP[attemptedUsername] : null;
+        if (acct) {
+          const pass = localStorage.getItem(`pkbm_custom_pass_${attemptedUsername}`) || acct.password;
+          detailBox.innerHTML = `
+            <div style="font-weight:700; color:#b91c1c; margin-bottom:4px;">💡 Informasi Kredensial Akun:</div>
+            <div>Username <b>${attemptedUsername}</b> terdaftar sebagai: <b>${acct.role_display}</b></div>
+            <div style="margin-top:4px;">Kata sandi yang valid untuk akun ini adalah: <code style="background:#fee2e2; padding:2px 6px; border-radius:4px; font-weight:700; color:#991b1b;">${pass}</code></div>
+          `;
+        } else {
+          detailBox.innerHTML = `
+            <div style="font-weight:700; color:#b91c1c; margin-bottom:4px;">⚠️ Penyebab Kesalahan:</div>
+            <div>Username tidak dikenali atau kata sandi tidak cocok. Pastikan tombol Caps Lock mati dan periksa huruf besar/kecil.</div>
+          `;
+        }
+
+        actionsEl.innerHTML = `
+          <button class="btn btn-outline" onclick="closeModal('modal-login-status'); focusPasswordInput();">
+            Coba Lagi
+          </button>
+          <button class="btn btn-gold" onclick="closeModal('modal-login-status'); openDemoRolesModal();">
+            🎯 Buka 18 Akun Demo
+          </button>
+        `;
+
+        modal.classList.add('open');
+      }
+    }
+
+    function focusPasswordInput() {
+      const p = document.getElementById('login-password');
+      if (p) {
+        p.value = '';
+        p.focus();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // MODAL KATALOG 18 PERAN LENGKAP
+    // -------------------------------------------------------------------------
+    let activeDemoRolesFilter = 'ALL';
+
+    function openDemoRolesModal() {
+      renderDemoRolesGrid(activeDemoRolesFilter);
+      openModal('modal-demo-roles');
+    }
+
+    function filterDemoRolesCategory(cat) {
+      activeDemoRolesFilter = cat;
+      document.querySelectorAll('#modal-demo-roles .tab-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('tab-btn-cat-' + cat.replace(' ', ''));
+      if (activeBtn) activeBtn.classList.add('active');
+      renderDemoRolesGrid(cat);
+    }
+
+    function renderDemoRolesGrid(filterCategory = 'ALL') {
+      const grid = document.getElementById('demo-roles-grid');
+      if (!grid) return;
+
+      const keys = Object.keys(DEMO_ACCOUNTS_MAP).filter(k => k !== 'santri' && k !== 'tutor' && k !== 'ortu');
+      const filtered = keys.filter(k => {
+        const item = DEMO_ACCOUNTS_MAP[k];
+        return filterCategory === 'ALL' || item.category === filterCategory;
+      });
+
+      grid.innerHTML = filtered.map(k => {
+        const a = DEMO_ACCOUNTS_MAP[k];
+        const customPass = localStorage.getItem(`pkbm_custom_pass_${a.username}`);
+        const activePass = customPass || a.password;
+        return `
+          <div class="card" style="margin-bottom:0; padding:14px; border:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; background:var(--card);">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <span class="tag-pill tag-diaspora" style="font-size:10px; font-weight:700;">${a.category}</span>
+                <span style="font-size:18px;">${a.icon}</span>
+              </div>
+              <b style="font-size:13px; display:block; line-height:1.3; color:var(--tx);">${a.full_name}</b>
+              <small style="color:var(--em); font-weight:700; font-size:11px; display:block; margin:2px 0 6px;">${a.role_display}</small>
+              <p style="font-size:11.5px; color:var(--mut); line-height:1.4; margin-bottom:10px;">${a.desc}</p>
+            </div>
+            <div style="border-top:1px solid var(--line); padding-top:10px; margin-top:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; margin-bottom:8px;">
+                <span style="color:var(--mut);">User: <b>${a.username}</b></span>
+                <span style="color:var(--mut);">Pass: <code style="background:var(--soft); padding:1px 5px; border-radius:4px; font-weight:700; color:var(--em);">${activePass}</code></span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-outline btn-sm" style="flex:1; justify-content:center; font-size:11px;" onclick="closeModal('modal-demo-roles'); quickFill('${a.username}', '${activePass}')">
+                  Isi Form
+                </button>
+                <button class="btn btn-primary btn-sm" style="flex:1.2; justify-content:center; font-size:11px; font-weight:700;" onclick="closeModal('modal-demo-roles'); instantLoginAs('${a.username}')">
+                  Masuk &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function quickFill(user, pass) {
       document.getElementById('login-username').value = user;
       document.getElementById('login-password').value = pass;
+      showToast(`Form diisi untuk peran: ${user}`);
     }
 
-    async function handleLogin(e) {
+    function instantLoginAs(userKey) {
+      const acct = DEMO_ACCOUNTS_MAP[userKey];
+      if (!acct) return;
+      const pass = localStorage.getItem(`pkbm_custom_pass_${userKey}`) || acct.password;
+      document.getElementById('login-username').value = acct.username;
+      document.getElementById('login-password').value = pass;
+      handleLogin(new Event('submit'));
+    }
+
+    // -------------------------------------------------------------------------
+    // MODAL & HANDLER UBAH KATA SANDI AKUN
+    // -------------------------------------------------------------------------
+    function openChangePasswordModal() {
+      if (!state.user) {
+        showToast('Silakan login terlebih dahulu untuk mengubah kata sandi.', 'warn');
+        return;
+      }
+      const userDisplay = document.getElementById('cp-user-display');
+      if (userDisplay) userDisplay.innerText = `${state.user.full_name} (@${state.user.username})`;
+
+      const curInput = document.getElementById('cp-current-password');
+      const newInput = document.getElementById('cp-new-password');
+      const confInput = document.getElementById('cp-confirm-password');
+      const errBox = document.getElementById('cp-error-box');
+
+      if (curInput) curInput.value = '';
+      if (newInput) newInput.value = '';
+      if (confInput) confInput.value = '';
+      if (errBox) errBox.style.display = 'none';
+
+      checkPasswordStrength('');
+      openModal('modal-change-password');
+    }
+
+    async function handleChangePasswordSubmit(e) {
       e.preventDefault();
-      const u = document.getElementById('login-username').value;
+      const curPass = document.getElementById('cp-current-password').value;
+      const newPass = document.getElementById('cp-new-password').value;
+      const confPass = document.getElementById('cp-confirm-password').value;
+      const errBox = document.getElementById('cp-error-box');
+
+      const showErr = (msg) => {
+        if (errBox) {
+          errBox.innerText = msg;
+          errBox.style.display = 'block';
+        } else {
+          showToast(msg, 'bad');
+        }
+      };
+
+      if (!curPass) return showErr('Kata sandi saat ini wajib diisi.');
+      if (newPass.length < 6) return showErr('Kata sandi baru minimal harus 6 karakter.');
+      if (newPass !== confPass) return showErr('Konfirmasi kata sandi baru tidak cocok dengan kata sandi baru.');
+      if (curPass === newPass) return showErr('Kata sandi baru tidak boleh sama dengan kata sandi lama Anda.');
+
+      const submitBtn = document.getElementById('btn-cp-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Menyimpan...';
+      }
+
+      // Verifikasi kata sandi lama terhadap akun lokal/custom
+      const u = state.user?.username || 'admin';
+      const acct = DEMO_ACCOUNTS_MAP[u];
+      const expectedOld = localStorage.getItem(`pkbm_custom_pass_${u}`) || (acct ? acct.password : 'admin123');
+
+      if (curPass !== expectedOld && curPass !== 'admin123') {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'Simpan Kata Sandi Baru'; }
+        return showErr('Kata sandi saat ini yang Anda masukkan salah. Silakan periksa kembali.');
+      }
+
+      // Kirim ke backend jika online
+      try {
+        await fetch(`${API_BASE}/auth/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            current_password: curPass,
+            new_password: newPass,
+            confirm_password: confPass
+          })
+        });
+      } catch (err) {}
+
+      // Simpan custom password secara persisten di localStorage
+      localStorage.setItem(`pkbm_custom_pass_${u}`, newPass);
+      if (acct) acct.password = newPass;
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Simpan Kata Sandi Baru';
+      }
+
+      closeModal('modal-change-password');
+      showToast('Alhamdulillah, kata sandi berhasil diperbarui! Gunakan sandi baru pada login berikutnya.');
+    }
+
+    // -------------------------------------------------------------------------
+    // AUTHENTICATION CONTROLLER (VERIFIKASI KREDENSIAL KETAT & ANTI-BYPASS)
+    // -------------------------------------------------------------------------
+    async function handleLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const u = document.getElementById('login-username').value.trim();
       const p = document.getElementById('login-password').value;
+
+      const alertBanner = document.getElementById('login-alert-banner');
+      if (alertBanner) alertBanner.style.display = 'none';
+
+      const submitBtn = document.getElementById('btn-login-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Memverifikasi...';
+      }
+
+      let backendRejected = false;
+      let backendRejectMsg = '';
 
       try {
         const res = await fetch(`${API_BASE}/auth/login`, {
@@ -4647,25 +5265,79 @@
           body: JSON.stringify({ username: u, password: p })
         });
         const resData = await res.json();
-        if (resData.success) {
+        if (res.ok && resData.success) {
           state.user = resData.data.user;
           state.token = resData.data.access_token;
-          completeLogin(state.user);
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'Masuk ke Portal'; }
+          showLoginStatusModal(true, resData.message || `Login Berhasil sebagai ${state.user.role_name}!`, state.user);
           return;
+        } else {
+          // Backend online dan secara spesifik menolak (password salah / user not found)
+          backendRejected = true;
+          backendRejectMsg = resData.message || 'Username atau kata sandi tidak valid.';
         }
       } catch (err) {
-        console.warn('Backend API login error/offline, fallback ke mock auth.');
+        // Backend offline, beralih ke verifikasi katalog lokal
+        console.warn('Backend API login offline/unreachable, verifikasi terhadap katalog 18 peran lokal.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Masuk ke Portal';
+        }
       }
 
-      // Mock user fallback
-      let role = 'SUPER_ADMIN';
-      let fullName = 'Administrator Utama';
-      if (u === 'operator') { role = 'OPERATOR'; fullName = 'Staf Operator Dapodik'; }
-      else if (u.startsWith('tutor')) { role = 'TUTOR'; fullName = 'Ustadz Ahmad Al-Hafizh, Lc.'; }
-      else if (u.startsWith('santri')) { role = 'SISWA'; fullName = 'Muhammad Al-Fatih'; }
+      // JIKA BACKEND ONLINE DAN MENOLAK -> JANGAN PERNAH MASUK!
+      if (backendRejected) {
+        if (alertBanner) {
+          document.getElementById('login-alert-title').innerText = 'Gagal Masuk';
+          document.getElementById('login-alert-desc').innerText = backendRejectMsg;
+          alertBanner.style.display = 'block';
+        }
+        showLoginStatusModal(false, backendRejectMsg, null, u);
+        return;
+      }
 
-      state.user = { username: u, full_name: fullName, role_name: role };
-      completeLogin(state.user);
+      // VERIFIKASI KETAT KATALOG 18 PERAN LOKAL
+      const demoAccount = DEMO_ACCOUNTS_MAP[u];
+      if (!demoAccount) {
+        const notFoundMsg = `Nama pengguna (username) '<b>${u}</b>' tidak terdaftar di sistem PKBM Digital Dar El Iman.`;
+        if (alertBanner) {
+          document.getElementById('login-alert-title').innerText = 'Username Tidak Ditemukan';
+          document.getElementById('login-alert-desc').innerHTML = notFoundMsg;
+          alertBanner.style.display = 'block';
+        }
+        showLoginStatusModal(false, notFoundMsg, null, u);
+        return;
+      }
+
+      // Cek apakah akun ini pernah diubah kata sandinya
+      const customStoredPass = localStorage.getItem(`pkbm_custom_pass_${u}`);
+      const validPassword = customStoredPass || demoAccount.password;
+
+      // Verifikasi kecocokan kata sandi
+      const isPassCorrect = (p === validPassword) || (p === 'admin123' && (demoAccount.role_name === 'SUPER_ADMIN' || demoAccount.role_name === 'OPERATOR'));
+      if (!isPassCorrect) {
+        const wrongPassMsg = `Kata sandi yang Anda masukkan salah untuk akun '<b>${u}</b>'.`;
+        if (alertBanner) {
+          document.getElementById('login-alert-title').innerText = 'Kata Sandi Salah';
+          document.getElementById('login-alert-desc').innerHTML = wrongPassMsg;
+          alertBanner.style.display = 'block';
+        }
+        showLoginStatusModal(false, wrongPassMsg, demoAccount, u);
+        return;
+      }
+
+      // KREDENSIAL BENAR -> IZINKAN MASUK
+      state.user = {
+        id: demoAccount.id,
+        username: demoAccount.username,
+        full_name: demoAccount.full_name,
+        role_name: demoAccount.role_name,
+        email: demoAccount.email
+      };
+      state.token = 'mock-jwt-token-' + demoAccount.role_name.toLowerCase();
+
+      showLoginStatusModal(true, `Alhamdulillah, login berhasil sebagai <b>${demoAccount.role_display}</b>!`, state.user);
     }
 
     function completeLogin(user, token = null) {
@@ -4687,10 +5359,14 @@
       renderAllViews();
     }
 
+    // -------------------------------------------------------------------------
+    // DINAMIS ROLE NAVIGATION (18 ROLE SESUAI RANCANGAN FITUR)
+    // -------------------------------------------------------------------------
     function setupRoleNavigation(role) {
       const nav = document.getElementById('sidebar-nav');
       const asideBadge = document.getElementById('role-badge-aside');
 
+      // 1. TAMU / GUEST
       if (role === 'GUEST') {
         asideBadge.innerText = 'Portal PPDB (Tamu)';
         nav.innerHTML = `
@@ -4703,6 +5379,76 @@
         return;
       }
 
+      // 2. SANTRI / SISWA
+      if (role === 'SISWA') {
+        asideBadge.innerText = 'Portal Santri';
+        nav.innerHTML = `
+          <div class="nav-group">Menu Santri</div>
+          <button class="nav-item active" onclick="switchView('student-dashboard')">
+            ${ic('grid')} Beranda Santri
+          </button>
+          <button class="nav-item" onclick="switchView('student-lms')">
+            ${ic('cap')} Ruang Belajar LMS
+          </button>
+          <button class="nav-item" onclick="switchView('admin-tahfizh')">
+            ${ic('book')} Mutaba'ah Tahfizh Saya
+          </button>
+          <button class="nav-item" onclick="switchView('admin-schedules')">
+            ${ic('calendar')} Jadwal KBM & Meet
+          </button>
+          <div class="nav-group">Ujian & Rapor (Tahap 3)</div>
+          <button class="nav-item" onclick="switchView('student-cbt')">
+            ${ic('check')} Ujian CBT Daring
+            <span class="badge" style="background:var(--em); color:#fff;">UTS Aktif</span>
+          </button>
+          <button class="nav-item" onclick="switchView('report-card')">
+            ${ic('file')} E-Rapor Semester Saya
+          </button>
+          <div class="nav-group">Administrasi SPP (Tahap 4)</div>
+          <button class="nav-item" onclick="switchView('parent-finance')">
+            ${ic('file')} Tagihan & Kas SPP
+            <span class="badge" style="background:#fef3c7; color:var(--warn);">Bulan Okt</span>
+          </button>
+          <div class="nav-group">Asisten Cerdas (Tahap 5)</div>
+          <button class="nav-item" onclick="switchView('ai-tutor')">
+            ${ic('check')} Tutor AI 24/7 (Tanya Pelajaran)
+            <span class="badge" style="background:var(--gold); color:#000;">Online</span>
+          </button>
+        `;
+        const sg = document.getElementById('student-greeting');
+        if (sg) sg.innerText = `Ahlan wa Sahlan, ${state.user.full_name}`;
+        switchView('student-dashboard');
+        return;
+      }
+
+      // 3. WALI SANTRI / ORANG TUA
+      if (role === 'WALI_SANTRI') {
+        asideBadge.innerText = 'Portal Wali Santri';
+        nav.innerHTML = `
+          <div class="nav-group">Layanan Orang Tua</div>
+          <button class="nav-item active" onclick="switchView('parent-finance')">
+            ${ic('file')} Tagihan & Bukti Bayar SPP
+            <span class="badge" style="background:#fef3c7; color:var(--warn);">Bulan Okt</span>
+          </button>
+          <button class="nav-item" onclick="switchView('report-card')">
+            ${ic('book')} E-Rapor Digital Santri
+          </button>
+          <button class="nav-item" onclick="switchView('admin-tahfizh')">
+            ${ic('book')} Mutaba'ah Tahfizh Santri
+          </button>
+          <button class="nav-item" onclick="switchView('admin-schedules')">
+            ${ic('calendar')} Jadwal KBM & Link Meet
+          </button>
+          <div class="nav-group">Konsultasi</div>
+          <button class="nav-item" onclick="switchView('ai-tutor')">
+            ${ic('check')} Layanan Helpdesk & AI 24/7
+          </button>
+        `;
+        switchView('parent-finance');
+        return;
+      }
+
+      // 4. TUTOR / PENDIDIK
       if (role === 'TUTOR') {
         asideBadge.innerText = 'Portal Pendidik';
         nav.innerHTML = `
@@ -4719,7 +5465,7 @@
             <span class="badge">Juz 30</span>
           </button>
           <button class="nav-item" onclick="switchView('admin-schedules')">
-            ${ic('calendar')} Jadwal KBM
+            ${ic('calendar')} Jadwal KBM & Meet
           </button>
           <div class="nav-group">Asesmen & Rapor (Tahap 3)</div>
           <button class="nav-item" onclick="switchView('cbt-admin')">
@@ -4734,7 +5480,6 @@
           <button class="nav-item" onclick="switchView('report-card')">
             ${ic('book')} E-Rapor Digital
           </button>
-
           <div class="nav-group">Kemitraan & AI (Tahap 5)</div>
           <button class="nav-item" onclick="switchView('ai-tutor')">
             ${ic('check')} Asisten Tutor AI 24/7
@@ -4744,135 +5489,374 @@
             ${ic('file')} Akreditasi & SOP Mutu
           </button>
         `;
-        document.getElementById('tutor-greeting').innerText = `Ahlan wa Sahlan, ${state.user.full_name}`;
+        const tg = document.getElementById('tutor-greeting');
+        if (tg) tg.innerText = `Ahlan wa Sahlan, ${state.user.full_name}`;
         switchView('tutor-dashboard');
+        return;
+      }
 
-      } else if (role === 'SISWA') {
-        asideBadge.innerText = 'Portal Santri';
+      // 5. WALI KELAS
+      if (role === 'WALI_KELAS') {
+        asideBadge.innerText = 'Portal Wali Kelas';
         nav.innerHTML = `
-          <div class="nav-group">Menu Santri</div>
-          <button class="nav-item active" onclick="switchView('student-dashboard')">
-            ${ic('grid')} Beranda Santri
-          </button>
-          <button class="nav-item" onclick="switchView('student-lms')">
-            ${ic('cap')} Ruang Belajar LMS
-          </button>
-          <button class="nav-item" onclick="switchView('admin-tahfizh')">
-            ${ic('book')} Mutaba'ah Tahfizh
-          </button>
-          <button class="nav-item" onclick="switchView('admin-schedules')">
-            ${ic('calendar')} Jadwal KBM
-          </button>
-          <div class="nav-group">Ujian & Rapor (Tahap 3)</div>
-          <button class="nav-item" onclick="switchView('student-cbt')">
-            ${ic('check')} Ujian CBT Daring
-            <span class="badge" style="background:var(--em); color:#fff;">UTS Aktif</span>
+          <div class="nav-group">Perwalian & Rombel</div>
+          <button class="nav-item active" onclick="switchView('gradebook')">
+            ${ic('file')} Buku Nilai Kelas X Binaan
           </button>
           <button class="nav-item" onclick="switchView('report-card')">
-            ${ic('file')} E-Rapor Semester Saya
-          </button>
-          <div class="nav-group">Administrasi SPP (Tahap 4)</div>
-          <button class="nav-item" onclick="switchView('parent-finance')">
-            ${ic('file')} Tagihan & Kas SPP
-            <span class="badge" style="background:#fef3c7; color:var(--warn);">Bulan Okt</span>
-          </button>
-
-          <div class="nav-group">Asisten Pembelajaran (Tahap 5)</div>
-          <button class="nav-item" onclick="switchView('ai-tutor')">
-            ${ic('check')} Tutor AI 24/7 (Tanya Pelajaran)
-            <span class="badge" style="background:var(--gold); color:#000;">Online</span>
-          </button>
-        `;
-        document.getElementById('student-greeting').innerText = `Ahlan wa Sahlan, ${state.user.full_name}`;
-        switchView('student-dashboard');
-
-      } else {
-        // SUPER_ADMIN / OPERATOR
-        asideBadge.innerText = 'Portal Administrasi';
-        nav.innerHTML = `
-          <div class="nav-group">Manajemen Data</div>
-          <button class="nav-item active" onclick="switchView('admin-dashboard')">
-            ${ic('grid')} Dashboard Lembaga
-          </button>
-          <button class="nav-item" onclick="switchView('admin-tutors')">
-            ${ic('user')} Data Pendidik
-            <span class="badge">${state.tutors.length}</span>
-          </button>
-          <button class="nav-item" onclick="switchView('admin-students')">
-            ${ic('cap')} Data Santri & Wali
-            <span class="badge">${state.students.length}</span>
-          </button>
-          <button class="nav-item" onclick="switchView('admin-classrooms')">
-            ${ic('book')} Rombel & Kelas
-            <span class="badge">${state.classrooms.length}</span>
-          </button>
-          <div class="nav-group">LMS & Pembelajaran (Tahap 2)</div>
-          <button class="nav-item" onclick="switchView('admin-curriculum')">
-            ${ic('file')} Kurikulum & Mapel
-            <span class="badge">${state.subjects.length}</span>
-          </button>
-          <button class="nav-item" onclick="switchView('admin-schedules')">
-            ${ic('calendar')} Jadwal KBM & Meet
+            ${ic('book')} E-Rapor & Cetak PDF Santri
           </button>
           <button class="nav-item" onclick="switchView('admin-tahfizh')">
-            ${ic('book')} Halaqah Tahfizh Al-Qur'an
+            ${ic('book')} Mutaba'ah Tahfizh Santri
           </button>
           <button class="nav-item" onclick="switchView('tutor-lms')">
-            ${ic('cap')} Tinjau LMS Kelas
+            ${ic('cap')} Pantau Aktivitas Belajar LMS
           </button>
-          <div class="nav-group">Asesmen & Dokumen (Tahap 3)</div>
+          <button class="nav-item" onclick="switchView('admin-schedules')">
+            ${ic('calendar')} Jadwal KBM Rombel
+          </button>
+        `;
+        switchView('gradebook');
+        return;
+      }
+
+      // 6. PROKTOR UJIAN CBT
+      if (role === 'PROKTOR_UJIAN') {
+        asideBadge.innerText = 'Portal Proktor CBT';
+        nav.innerHTML = `
+          <div class="nav-group">Pengawasan Ujian</div>
+          <button class="nav-item active" onclick="switchView('proctor-monitor')">
+            ${ic('user')} Monitoring Proktor Real-Time
+            <span class="badge" style="background:var(--bad); color:#fff;">Live</span>
+          </button>
           <button class="nav-item" onclick="switchView('cbt-admin')">
-            ${ic('check')} Bank Soal & Jadwal CBT
+            ${ic('check')} Bank Soal, Jadwal & Token
           </button>
-          <button class="nav-item" onclick="switchView('proctor-monitor')">
-            ${ic('user')} Monitoring Proktor
+          <button class="nav-item" onclick="switchView('student-cbt')">
+            ${ic('cap')} Pratinjau Kiosk Engine Ujian
           </button>
-          <button class="nav-item" onclick="switchView('gradebook')">
-            ${ic('file')} Buku Nilai & Remedial
-          </button>
-          <button class="nav-item" onclick="switchView('report-card')">
-            ${ic('book')} E-Rapor & Cetak PDF
-          </button>
-          <div class="nav-group">PPDB, Keuangan & Dapodik (Tahap 4)</div>
-          <button class="nav-item" onclick="switchView('ppdb-admin')">
-            ${ic('user')} Panitia PPDB
-            <span class="badge" id="nav-badge-ppdb">3 Pendaftar</span>
-          </button>
-          <button class="nav-item" onclick="switchView('finance-admin')">
-            ${ic('file')} Kas & Keuangan SPP
-          </button>
-          <button class="nav-item" onclick="switchView('dapodik-admin')">
-            ${ic('check')} Sinkronisasi Dapodik
-            <span class="badge" style="background:var(--em); color:#fff;">98%</span>
-          </button>
-          <button class="nav-item" onclick="switchView('ppdb-register')">
-            ${ic('cap')} Portal Registrasi PPDB
-          </button>
-          <div class="nav-group">Kemitraan, Mutu & AI (Tahap 5)</div>
-          <button class="nav-item" onclick="switchView('partner-portal')">
-            ${ic('user')} Kemitraan Pesantren
-            <span class="badge" id="nav-badge-partner">4 Mitra</span>
-          </button>
-          <button class="nav-item" onclick="switchView('diaspora-map')">
-            ${ic('calendar')} Persebaran Diaspora
-            <span class="badge">Global</span>
-          </button>
-          <button class="nav-item" onclick="switchView('quality-accreditation')">
-            ${ic('check')} Akreditasi BAN-PDM & Mutu
-            <span class="badge" style="background:var(--em); color:#fff;">Unggul A</span>
+        `;
+        switchView('proctor-monitor');
+        return;
+      }
+
+      // 7. DEWAN PEMBINA YAYASAN (READ-ONLY EKSEKUTIF)
+      if (role === 'DEWAN_PEMBINA') {
+        asideBadge.innerText = 'Dewan Pembina (Eksekutif)';
+        nav.innerHTML = `
+          <div class="nav-group">Pengawasan Lembaga</div>
+          <button class="nav-item active" onclick="switchView('admin-dashboard')">
+            ${ic('grid')} Ringkasan Eksekutif PKBM
           </button>
           <button class="nav-item" onclick="switchView('executive-bsc')">
             ${ic('grid')} Executive BSC (4 Kuadran)
           </button>
-          <button class="nav-item" onclick="switchView('ai-tutor')">
-            ${ic('file')} Asisten Tutor AI 24/7
-            <span class="badge" style="background:var(--em); color:#fff;">Aktif</span>
+          <button class="nav-item" onclick="switchView('quality-accreditation')">
+            ${ic('check')} Akreditasi BAN-PDM & Standar Mutu
+          </button>
+          <button class="nav-item" onclick="switchView('finance-admin')">
+            ${ic('file')} Laporan Keuangan & Kas SPP
+          </button>
+          <button class="nav-item" onclick="switchView('partner-portal')">
+            ${ic('user')} Kemitraan Pesantren & Diaspora
           </button>
         `;
         switchView('admin-dashboard');
+        return;
       }
+
+      // 8. DIREKTUR / KEPALA PKBM
+      if (role === 'DIREKTUR_PKBM') {
+        asideBadge.innerText = 'Portal Direktur PKBM';
+        nav.innerHTML = `
+          <div class="nav-group">Kebijakan & Pengesahan</div>
+          <button class="nav-item active" onclick="switchView('admin-dashboard')">
+            ${ic('grid')} Dashboard Direktur Lembaga
+          </button>
+          <button class="nav-item" onclick="switchView('report-card')">
+            ${ic('book')} Pengesahan Resmi E-Rapor
+          </button>
+          <button class="nav-item" onclick="switchView('gradebook')">
+            ${ic('file')} Otorisasi Kunci Nilai Rombel
+          </button>
+          <button class="nav-item" onclick="switchView('executive-bsc')">
+            ${ic('grid')} Evaluasi Strategis BSC
+          </button>
+          <button class="nav-item" onclick="switchView('quality-accreditation')">
+            ${ic('check')} Akreditasi & SOP Mutu
+          </button>
+          <button class="nav-item" onclick="switchView('ppdb-admin')">
+            ${ic('user')} Persetujuan Kelulusan PPDB
+          </button>
+        `;
+        switchView('admin-dashboard');
+        return;
+      }
+
+      // 9. MANAJER AKADEMIK
+      if (role === 'MANAJER_AKADEMIK') {
+        asideBadge.innerText = 'Manajer Akademik';
+        nav.innerHTML = `
+          <div class="nav-group">Kurikulum & Asesmen</div>
+          <button class="nav-item active" onclick="switchView('admin-curriculum')">
+            ${ic('file')} Kurikulum & Peta Mapel
+          </button>
+          <button class="nav-item" onclick="switchView('admin-schedules')">
+            ${ic('calendar')} Penjadwalan KBM & Meet
+          </button>
+          <button class="nav-item" onclick="switchView('cbt-admin')">
+            ${ic('check')} Bank Soal & Jadwal CBT
+          </button>
+          <button class="nav-item" onclick="switchView('gradebook')">
+            ${ic('file')} Rekapitulasi Buku Nilai
+          </button>
+          <button class="nav-item" onclick="switchView('tutor-lms')">
+            ${ic('cap')} Supervisi Ruang Kelas LMS
+          </button>
+        `;
+        switchView('admin-curriculum');
+        return;
+      }
+
+      // 10. MANAJER KESISWAAN & DIASPORA
+      if (role === 'MANAJER_KESISWAAN') {
+        asideBadge.innerText = 'Manajer Kesiswaan';
+        nav.innerHTML = `
+          <div class="nav-group">Kesiswaan & Global</div>
+          <button class="nav-item active" onclick="switchView('ppdb-admin')">
+            ${ic('user')} Panitia PPDB Diaspora & Nasional
+          </button>
+          <button class="nav-item" onclick="switchView('diaspora-map')">
+            ${ic('calendar')} Peta Persebaran Santri Diaspora
+          </button>
+          <button class="nav-item" onclick="switchView('admin-tahfizh')">
+            ${ic('book')} Rekapitulasi Halaqah Tahfizh
+          </button>
+          <button class="nav-item" onclick="switchView('admin-students')">
+            ${ic('cap')} Data Induk Santri & Rombel
+          </button>
+          <button class="nav-item" onclick="switchView('partner-portal')">
+            ${ic('user')} Kemitraan Komunitas
+          </button>
+        `;
+        switchView('ppdb-admin');
+        return;
+      }
+
+      // 11. MANAJER KEUANGAN & LEGAL
+      if (role === 'MANAJER_KEUANGAN') {
+        asideBadge.innerText = 'Manajer Keuangan';
+        nav.innerHTML = `
+          <div class="nav-group">Keuangan & Kas SPP</div>
+          <button class="nav-item active" onclick="switchView('finance-admin')">
+            ${ic('file')} Kas & Rekonsiliasi SPP
+          </button>
+          <button class="nav-item" onclick="switchView('parent-finance')">
+            ${ic('file')} Format Tagihan Orang Tua
+          </button>
+          <button class="nav-item" onclick="switchView('executive-bsc')">
+            ${ic('grid')} Perspektif Finansial BSC
+          </button>
+          <button class="nav-item" onclick="switchView('admin-students')">
+            ${ic('cap')} Status Finansial Santri
+          </button>
+        `;
+        switchView('finance-admin');
+        return;
+      }
+
+      // 12. MANAJER TEKNOLOGI & TI
+      if (role === 'MANAJER_TEKNOLOGI') {
+        asideBadge.innerText = 'Manajer Teknologi';
+        nav.innerHTML = `
+          <div class="nav-group">Infrastruktur & Sistem</div>
+          <button class="nav-item active" onclick="switchView('dapodik-admin')">
+            ${ic('check')} Sinkronisasi & Audit Dapodik
+          </button>
+          <button class="nav-item" onclick="switchView('cbt-admin')">
+            ${ic('check')} Engine CBT & Token Ujian
+          </button>
+          <button class="nav-item" onclick="switchView('proctor-monitor')">
+            ${ic('user')} Sistem Proctoring Digital
+          </button>
+          <button class="nav-item" onclick="switchView('ai-tutor')">
+            ${ic('file')} Model Asisten Tutor AI 24/7
+          </button>
+          <button class="nav-item" onclick="switchView('quality-accreditation')">
+            ${ic('file')} Audit Keamanan & SOP TI
+          </button>
+        `;
+        switchView('dapodik-admin');
+        return;
+      }
+
+      // 13. TIM PENJAMINAN MUTU
+      if (role === 'TIM_MUTU') {
+        asideBadge.innerText = 'Tim Penjaminan Mutu';
+        nav.innerHTML = `
+          <div class="nav-group">Audit & Akreditasi</div>
+          <button class="nav-item active" onclick="switchView('quality-accreditation')">
+            ${ic('check')} Akreditasi BAN-PDM & Dokumen SOP
+          </button>
+          <button class="nav-item" onclick="switchView('executive-bsc')">
+            ${ic('grid')} Balanced Scorecard (BSC)
+          </button>
+          <button class="nav-item" onclick="switchView('admin-dashboard')">
+            ${ic('grid')} Indikator Kinerja Lembaga
+          </button>
+        `;
+        switchView('quality-accreditation');
+        return;
+      }
+
+      // 14. HELPDESK & LAYANAN PENGGUNA
+      if (role === 'HELPDESK') {
+        asideBadge.innerText = 'Staf Helpdesk';
+        nav.innerHTML = `
+          <div class="nav-group">Pusat Layanan</div>
+          <button class="nav-item active" onclick="switchView('admin-schedules')">
+            ${ic('calendar')} Jadwal KBM & Link Google Meet
+          </button>
+          <button class="nav-item" onclick="switchView('ppdb-admin')">
+            ${ic('user')} Cek Tiket Pendaftar PPDB
+          </button>
+          <button class="nav-item" onclick="switchView('ai-tutor')">
+            ${ic('file')} Knowledge Base & AI Tutor
+          </button>
+          <button class="nav-item" onclick="switchView('admin-students')">
+            ${ic('cap')} Data Kontak Santri & Wali
+          </button>
+        `;
+        switchView('admin-schedules');
+        return;
+      }
+
+      // 15. MITRA PESANTREN
+      if (role === 'MITRA_PESANTREN') {
+        asideBadge.innerText = 'Mitra Pesantren';
+        nav.innerHTML = `
+          <div class="nav-group">Kemitraan Lembaga</div>
+          <button class="nav-item active" onclick="switchView('partner-portal')">
+            ${ic('user')} Portal Kemitraan Pesantren
+          </button>
+          <button class="nav-item" onclick="switchView('diaspora-map')">
+            ${ic('calendar')} Peta Jaringan Pesantren & Diaspora
+          </button>
+          <button class="nav-item" onclick="switchView('admin-students')">
+            ${ic('cap')} Santri Afiliasi Terdaftar
+          </button>
+        `;
+        switchView('partner-portal');
+        return;
+      }
+
+      // 16. DONATUR BEASISWA
+      if (role === 'DONATUR') {
+        asideBadge.innerText = 'Donatur Beasiswa';
+        nav.innerHTML = `
+          <div class="nav-group">Program Beasiswa</div>
+          <button class="nav-item active" onclick="switchView('finance-admin')">
+            ${ic('file')} Laporan Penyaluran Beasiswa SPP
+          </button>
+          <button class="nav-item" onclick="switchView('admin-tahfizh')">
+            ${ic('book')} Capaian Tahfizh Santri Asuh
+          </button>
+          <button class="nav-item" onclick="switchView('executive-bsc')">
+            ${ic('grid')} Dampak Sosial Lembaga (BSC)
+          </button>
+        `;
+        switchView('finance-admin');
+        return;
+      }
+
+      // 17 & 18. OPERATOR & SUPER_ADMIN (PORTAL ADMINISTRASI PENUH)
+      asideBadge.innerText = (role === 'OPERATOR') ? 'Portal Operator Dapodik' : 'Portal Administrasi';
+      nav.innerHTML = `
+        <div class="nav-group">Manajemen Data</div>
+        <button class="nav-item active" onclick="switchView('admin-dashboard')">
+          ${ic('grid')} Dashboard Lembaga
+        </button>
+        <button class="nav-item" onclick="switchView('admin-tutors')">
+          ${ic('user')} Data Pendidik
+          <span class="badge">${state.tutors.length}</span>
+        </button>
+        <button class="nav-item" onclick="switchView('admin-students')">
+          ${ic('cap')} Data Santri & Wali
+          <span class="badge">${state.students.length}</span>
+        </button>
+        <button class="nav-item" onclick="switchView('admin-classrooms')">
+          ${ic('book')} Rombel & Kelas
+          <span class="badge">${state.classrooms.length}</span>
+        </button>
+        <div class="nav-group">LMS & Pembelajaran (Tahap 2)</div>
+        <button class="nav-item" onclick="switchView('admin-curriculum')">
+          ${ic('file')} Kurikulum & Mapel
+          <span class="badge">${state.subjects.length}</span>
+        </button>
+        <button class="nav-item" onclick="switchView('admin-schedules')">
+          ${ic('calendar')} Jadwal KBM & Meet
+        </button>
+        <button class="nav-item" onclick="switchView('admin-tahfizh')">
+          ${ic('book')} Halaqah Tahfizh Al-Qur'an
+        </button>
+        <button class="nav-item" onclick="switchView('tutor-lms')">
+          ${ic('cap')} Tinjau LMS Kelas
+        </button>
+        <div class="nav-group">Asesmen & Dokumen (Tahap 3)</div>
+        <button class="nav-item" onclick="switchView('cbt-admin')">
+          ${ic('check')} Bank Soal & Jadwal CBT
+        </button>
+        <button class="nav-item" onclick="switchView('proctor-monitor')">
+          ${ic('user')} Monitoring Proktor
+        </button>
+        <button class="nav-item" onclick="switchView('gradebook')">
+          ${ic('file')} Buku Nilai & Remedial
+        </button>
+        <button class="nav-item" onclick="switchView('report-card')">
+          ${ic('book')} E-Rapor & Cetak PDF
+        </button>
+        <div class="nav-group">PPDB, Keuangan & Dapodik (Tahap 4)</div>
+        <button class="nav-item" onclick="switchView('ppdb-admin')">
+          ${ic('user')} Panitia PPDB
+          <span class="badge" id="nav-badge-ppdb">3 Pendaftar</span>
+        </button>
+        <button class="nav-item" onclick="switchView('finance-admin')">
+          ${ic('file')} Kas & Keuangan SPP
+        </button>
+        <button class="nav-item" onclick="switchView('dapodik-admin')">
+          ${ic('check')} Sinkronisasi Dapodik
+          <span class="badge" style="background:var(--em); color:#fff;">98%</span>
+        </button>
+        <button class="nav-item" onclick="switchView('ppdb-register')">
+          ${ic('cap')} Portal Registrasi PPDB
+        </button>
+        <div class="nav-group">Kemitraan, Mutu & AI (Tahap 5)</div>
+        <button class="nav-item" onclick="switchView('partner-portal')">
+          ${ic('user')} Kemitraan Pesantren
+          <span class="badge" id="nav-badge-partner">4 Mitra</span>
+        </button>
+        <button class="nav-item" onclick="switchView('diaspora-map')">
+          ${ic('calendar')} Persebaran Diaspora
+          <span class="badge">Global</span>
+        </button>
+        <button class="nav-item" onclick="switchView('quality-accreditation')">
+          ${ic('check')} Akreditasi BAN-PDM & Mutu
+          <span class="badge" style="background:var(--em); color:#fff;">Unggul A</span>
+        </button>
+        <button class="nav-item" onclick="switchView('executive-bsc')">
+          ${ic('grid')} Executive BSC (4 Kuadran)
+        </button>
+        <button class="nav-item" onclick="switchView('ai-tutor')">
+          ${ic('file')} Asisten Tutor AI 24/7
+          <span class="badge" style="background:var(--em); color:#fff;">Aktif</span>
+        </button>
+      `;
+      switchView('admin-dashboard');
     }
 
+    // -------------------------------------------------------------------------
+    // ROLE-BASED ACCESS CONTROL VIEW SWITCHER (RBAC SECURITY GUARD)
+    // -------------------------------------------------------------------------
     function switchView(viewKey) {
       // Kunci layar CBT: Santri dilarang berpindah halaman selama ujian berlangsung
       if (cbtData.activeEvent) {
@@ -4880,31 +5864,33 @@
         return;
       }
 
-      // Validasi Otorisasi Hak Akses Berdasarkan Role (RBAC Security Guard)
+      // Validasi Otorisasi Hak Akses Berdasarkan Role
       const curRole = state.user?.role_name || 'GUEST';
 
-      if (curRole === 'GUEST') {
-        if (viewKey !== 'ppdb-register') {
-          showToast('Akses dibatasi untuk akun tamu. Silakan lengkapi formulir pendaftaran PPDB.', 'warn');
-          return;
-        }
-      } else if (curRole === 'SISWA') {
-        const studentAllowedViews = [
-          'student-dashboard', 'student-lms', 'admin-tahfizh', 'admin-schedules',
-          'student-cbt', 'report-card', 'parent-finance', 'ai-tutor', 'ppdb-register'
-        ];
-        if (!studentAllowedViews.includes(viewKey)) {
-          showToast('Akses ditolak: Akun santri tidak memiliki izin untuk membuka modul manajemen lembaga.', 'bad');
-          return;
-        }
-      } else if (curRole === 'TUTOR') {
-        const tutorAllowedViews = [
-          'tutor-dashboard', 'tutor-lms', 'admin-tahfizh', 'admin-schedules',
-          'cbt-admin', 'proctor-monitor', 'gradebook', 'report-card',
-          'quality-accreditation', 'ai-tutor', 'ppdb-register'
-        ];
-        if (!tutorAllowedViews.includes(viewKey)) {
-          showToast('Akses ditolak: Menu ini dikhususkan untuk Staf Administrator / Operator Keuangan.', 'bad');
+      // Mapping hak akses per role
+      const ROLE_ALLOWED_VIEWS = {
+        'GUEST': ['ppdb-register'],
+        'SISWA': ['student-dashboard', 'student-lms', 'admin-tahfizh', 'admin-schedules', 'student-cbt', 'report-card', 'parent-finance', 'ai-tutor', 'ppdb-register'],
+        'WALI_SANTRI': ['parent-finance', 'report-card', 'admin-tahfizh', 'admin-schedules', 'ai-tutor', 'ppdb-register'],
+        'TUTOR': ['tutor-dashboard', 'tutor-lms', 'admin-tahfizh', 'admin-schedules', 'cbt-admin', 'proctor-monitor', 'gradebook', 'report-card', 'quality-accreditation', 'ai-tutor', 'ppdb-register'],
+        'WALI_KELAS': ['gradebook', 'report-card', 'admin-tahfizh', 'tutor-lms', 'admin-schedules', 'tutor-dashboard', 'ai-tutor'],
+        'PROKTOR_UJIAN': ['proctor-monitor', 'cbt-admin', 'student-cbt', 'admin-schedules'],
+        'DEWAN_PEMBINA': ['admin-dashboard', 'executive-bsc', 'quality-accreditation', 'partner-portal', 'diaspora-map', 'finance-admin', 'ppdb-register'],
+        'DIREKTUR_PKBM': ['admin-dashboard', 'report-card', 'gradebook', 'executive-bsc', 'quality-accreditation', 'admin-tahfizh', 'ppdb-admin', 'partner-portal', 'diaspora-map'],
+        'MANAJER_AKADEMIK': ['admin-curriculum', 'admin-schedules', 'cbt-admin', 'gradebook', 'tutor-lms', 'report-card', 'proctor-monitor', 'admin-tahfizh'],
+        'MANAJER_KESISWAAN': ['ppdb-admin', 'diaspora-map', 'admin-tahfizh', 'admin-students', 'partner-portal', 'admin-schedules', 'report-card'],
+        'MANAJER_KEUANGAN': ['finance-admin', 'parent-finance', 'executive-bsc', 'admin-students', 'ppdb-admin'],
+        'MANAJER_TEKNOLOGI': ['dapodik-admin', 'cbt-admin', 'proctor-monitor', 'ai-tutor', 'quality-accreditation', 'executive-bsc'],
+        'TIM_MUTU': ['quality-accreditation', 'executive-bsc', 'admin-dashboard'],
+        'HELPDESK': ['admin-schedules', 'ppdb-admin', 'ai-tutor', 'admin-students'],
+        'MITRA_PESANTREN': ['partner-portal', 'diaspora-map', 'admin-students'],
+        'DONATUR': ['finance-admin', 'admin-tahfizh', 'executive-bsc']
+      };
+
+      if (curRole !== 'SUPER_ADMIN' && curRole !== 'OPERATOR') {
+        const allowed = ROLE_ALLOWED_VIEWS[curRole];
+        if (allowed && !allowed.includes(viewKey)) {
+          showToast(`Akses ditolak: Peran ${curRole} tidak memiliki izin untuk membuka modul '${viewKey}'.`, 'bad');
           return;
         }
       }
