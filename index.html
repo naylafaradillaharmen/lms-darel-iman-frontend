@@ -2317,7 +2317,7 @@
                   <p style="font-size:11px; color:var(--mut); margin:4px 0 10px;">Scan KK asli yang masih berlaku</p>
                   <input type="file" id="file-kk" style="display:none;" onchange="updateFileName(this, 'txt-kk')">
                   <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-kk').click()">Pilih Berkas</button>
-                  <div id="txt-kk" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600;">kk_keluarga.pdf (Terpilih)</div>
+                  <div id="txt-kk" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600; display:none;"></div>
                 </div>
 
                 <div style="border:1.5px dashed var(--line); border-radius:10px; padding:16px; background:var(--bg); text-align:center;">
@@ -2326,7 +2326,7 @@
                   <p style="font-size:11px; color:var(--mut); margin:4px 0 10px;">Scan akta kelahiran resmi Dukcapil</p>
                   <input type="file" id="file-akta" style="display:none;" onchange="updateFileName(this, 'txt-akta')">
                   <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-akta').click()">Pilih Berkas</button>
-                  <div id="txt-akta" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600;">akta_kelahiran.pdf (Terpilih)</div>
+                  <div id="txt-akta" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600; display:none;"></div>
                 </div>
 
                 <div style="border:1.5px dashed var(--line); border-radius:10px; padding:16px; background:var(--bg); text-align:center;">
@@ -2335,7 +2335,7 @@
                   <p style="font-size:11px; color:var(--mut); margin:4px 0 10px;">Ijazah SD/SMP atau surat keterangan lulus</p>
                   <input type="file" id="file-ijazah" style="display:none;" onchange="updateFileName(this, 'txt-ijazah')">
                   <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-ijazah').click()">Pilih Berkas</button>
-                  <div id="txt-ijazah" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600;">ijazah_terakhir.pdf (Terpilih)</div>
+                  <div id="txt-ijazah" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600; display:none;"></div>
                 </div>
 
                 <div style="border:1.5px dashed var(--line); border-radius:10px; padding:16px; background:var(--bg); text-align:center;">
@@ -2344,7 +2344,7 @@
                   <p style="font-size:11px; color:var(--mut); margin:4px 0 10px;">Identitas resmi wali atau surat konsulat</p>
                   <input type="file" id="file-ktp" style="display:none;" onchange="updateFileName(this, 'txt-ktp')">
                   <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-ktp').click()">Pilih Berkas</button>
-                  <div id="txt-ktp" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600;">ktp_wali.jpg (Terpilih)</div>
+                  <div id="txt-ktp" style="font-size:11px; color:var(--em); margin-top:6px; font-weight:600; display:none;"></div>
                 </div>
               </div>
 
@@ -6418,9 +6418,16 @@
     }
 
     function updateFileName(input, targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
       if (input.files && input.files[0]) {
-        document.getElementById(targetId).innerText = `${input.files[0].name} (Terpilih)`;
-        document.getElementById(targetId).style.color = 'var(--em)';
+        el.style.display = 'block';
+        el.innerText = `📄 ${input.files[0].name} (Terpilih)`;
+        el.style.color = 'var(--em)';
+        showToast(`Berkas ${input.files[0].name} berhasil dipilih!`);
+      } else {
+        el.style.display = 'none';
+        el.innerText = '';
       }
     }
 
@@ -6468,8 +6475,8 @@
         status: 'SUBMITTED',
         notes: 'Pendaftaran mandiri via portal online',
         documents: [
-          { id: 'doc-1', document_type: 'KK', file_url: 'kk_keluarga.pdf', is_verified: false },
-          { id: 'doc-2', document_type: 'AKTA_LAHIR', file_url: 'akta_kelahiran.pdf', is_verified: false }
+          { id: 'doc-1', document_type: 'KK', file_url: document.getElementById('file-kk')?.files?.[0]?.name || 'Berkas KK (Terlampir)', is_verified: false },
+          { id: 'doc-2', document_type: 'AKTA_LAHIR', file_url: document.getElementById('file-akta')?.files?.[0]?.name || 'Berkas Akta (Terlampir)', is_verified: false }
         ]
       };
 
