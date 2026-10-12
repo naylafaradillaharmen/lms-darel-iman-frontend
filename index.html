@@ -493,6 +493,50 @@
       color: var(--em);
     }
 
+    
+    .checklist-tab {
+      padding: 10px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--mut);
+      background: none;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .checklist-tab.active {
+      color: var(--em);
+      border-bottom-color: var(--em);
+      background: var(--card);
+    }
+    .check-item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: var(--card);
+      transition: background .15s, border-color .15s;
+    }
+    .check-item-row:hover {
+      background: var(--bg);
+    }
+    .check-item-row.checked {
+      background: rgba(4, 120, 87, 0.04);
+      border-color: rgba(4, 120, 87, 0.3);
+    }
+    .check-item-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--em);
+      cursor: pointer;
+      margin-top: 2px;
+    }
+
     /* MODALS */
     .modal-overlay {
       position: fixed;
@@ -4534,6 +4578,7 @@
       populateDropdowns();
       fetchInitialData();
       renderAllViews();
+      if (typeof renderFeatureChecklist === 'function') renderFeatureChecklist();
 
       // AUTO-RESTORE LOGIN SESSION SAAT REFRESH HALAMAN (TETAP LOGIN)
       try {
@@ -5379,6 +5424,196 @@
           showToast('Link Google Meet dikosongkan. Santri akan melihat penanda belum ada link.');
         }
       }
+    }
+
+    
+    // =========================================================================
+    // AUDIT & CHECKLIST PENGUJIAN FITUR INTERAKTIF (TAHAP 1 - 5)
+    // =========================================================================
+    const FEATURE_CHECKLIST_DATA = {
+      t1: {
+        title: 'Tahap 1: Fondasi Sistem, Autentikasi & Input Master Data',
+        items: [
+          { id: 't1_1', title: 'Login Multi-Peran (RBAC)', guide: 'Coba login sebagai admin, ustadz, santri, dan tamu. Pastikan menu sidebar menyesuaikan secara otomatis.', targetView: 'admin-dashboard', targetRole: 'admin' },
+          { id: 't1_2', title: 'Master Data Santri Terintegrasi', guide: 'Buka menu Data Santri (Admin). Pastikan NIS, Rombel, status aktif, dan penanda Diaspora / Nasional tampil.', targetView: 'admin-students', targetRole: 'admin' },
+          { id: 't1_3', title: 'Master Data Tutor & Pendidik', guide: 'Buka menu Data Tutor (Admin). Pastikan NIP, mata pelajaran pengampu, dan kontak ustadz tampil lengkap.', targetView: 'admin-tutors', targetRole: 'admin' },
+          { id: 't1_4', title: 'Rombongan Belajar (Rombel/Kelas)', guide: 'Buka menu Rombel & Kelas (Admin). Pastikan rombel Paket A, B, C terbentuk beserta wali kelas dan kapasitas santri.', targetView: 'admin-classrooms', targetRole: 'admin' },
+          { id: 't1_5', title: 'Unduh Contoh & Impor CSV Santri', guide: 'Klik tombol Unduh Contoh CSV dan Impor CSV pada halaman Data Santri.', targetView: 'admin-students', targetRole: 'admin' }
+        ]
+      },
+      t2: {
+        title: 'Tahap 2: Kurikulum, Pembelajaran LMS & Halaqah Tahfizh',
+        items: [
+          { id: 't2_1', title: 'Katalog Kurikulum & Mata Pelajaran', guide: 'Buka menu Mata Pelajaran (Admin). Pastikan 6 mata pelajaran resmi (Tahfizh, PAI, AI Literacy, dll) terdaftar.', targetView: 'admin-subjects', targetRole: 'admin' },
+          { id: 't2_2', title: 'Modul LMS Materi & Tugas', guide: 'Login Santri di Ruang Belajar LMS. Buka tab Materi untuk melihat PDF/video dan tab Tugas untuk kumpulkan tugas.', targetView: 'student-lms', targetRole: 'santri' },
+          { id: 't2_3', title: 'Google Meet Terintegrasi (Kondisional)', guide: 'Periksa tombol Meet di header Ruang Belajar LMS santri. Tombol hanya aktif jika link sudah diinput oleh Ustadz.', targetView: 'student-lms', targetRole: 'santri' },
+          { id: 't2_4', title: 'Mutaba\'ah Setoran Tahfizh (RBAC Ketat)', guide: 'Buka menu Mutaba\'ah Tahfizh sebagai Santri. Santri hanya memantau setoran; tombol catat nilai hanya ada di akun Ustadz.', targetView: 'admin-tahfizh', targetRole: 'santri' },
+          { id: 't2_5', title: 'Batasan Pembentukan Halaqah', guide: 'Hanya Admin yang berhak membuat kelompok halaqah baru. Santri dan Tutor dicegah jika mencoba membuat halaqah.', targetView: 'admin-tahfizh', targetRole: 'santri' }
+        ]
+      },
+      t3: {
+        title: 'Tahap 3: Asesmen CBT Daring, Proctoring & E-Rapor Digital',
+        items: [
+          { id: 't3_1', title: 'Bank Soal & Jadwal CBT', guide: 'Buka Bank Soal & CBT (Admin/Tutor). Periksa 11 butir soal ujian (10 PG dan 1 Esai) yang siap diujikan.', targetView: 'cbt-admin', targetRole: 'admin' },
+          { id: 't3_2', title: 'Gerbang Token CBT Santri', guide: 'Buka Ujian CBT Daring (Santri). Masukkan token TAHFIZH26 untuk memulai ujian.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_3', title: 'Lembar Soal Bersih (Kunci Tidak Nyala)', guide: 'Mulai ujian CBT. Pastikan tidak ada opsi yang otomatis hijau di awal, palet nomor berstatus netral.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_4', title: 'Kiosk Fullscreen & Anti-Cheat', guide: 'Ujian berlangsung dalam mode layar penuh. Keluar fullscreen akan memicu banner peringatan dan overlay lockdown.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_5', title: 'Pop-up Konfirmasi Selesai di Tengah', guide: 'Klik tombol Selesai & Kirim Ujian. Pop-up konfirmasi muncul rapi di tengah dengan ringkasan jumlah terjawab.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_6', title: 'Hasil & Pembahasan Tajwid Lengkap', guide: 'Setelah submit, santri diarahkan ke halaman hasil ujian lengkap dengan kunci jawaban dan rujukan tajwid tanpa emotikon berlebihan.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_7', title: 'Riwayat Ujian & Pengulangan Latihan', guide: 'Sesi ujian tersimpan di tabel riwayat. Santri dapat meninjau pembahasan kapan saja atau mengulang latihan.', targetView: 'student-cbt', targetRole: 'santri' },
+          { id: 't3_8', title: 'E-Rapor Digital & Modal Verifikasi QR', guide: 'Buka E-Rapor Semester Saya. Klik Cek Keaslian QR Code, jendela verifikasi dokumen dapat ditutup dengan mudah.', targetView: 'report-card', targetRole: 'santri' }
+        ]
+      },
+      t4: {
+        title: 'Tahap 4: PPDB Online, Keuangan SPP & Ekspor Dapodik',
+        items: [
+          { id: 't4_1', title: 'Isolasi Akses Akun Tamu (GUEST)', guide: 'Login sebagai Tamu (tamu). Sidebar hanya menampilkan menu Pendaftaran Santri Baru; menu internal terkunci rapi.', targetView: 'ppdb-register', targetRole: 'tamu' },
+          { id: 't4_2', title: 'Upload Berkas PPDB Calon Santri', guide: 'Pada formulir PPDB, status berkas hanya bertuliskan (Terpilih) jika file benar-benar dipilih tanpa dummy bawaan.', targetView: 'ppdb-register', targetRole: 'tamu' },
+          { id: 't4_3', title: 'Verifikasi Panitia PPDB (Admin)', guide: 'Login Admin di menu Panitia PPDB. Buka detail pendaftar dan ubah status calon santri menjadi DITERIMA.', targetView: 'ppdb-admin', targetRole: 'admin' },
+          { id: 't4_4', title: 'Menu PPDB Bersih dari Santri Aktif', guide: 'Login sebagai Santri aktif. Menu info PPDB sudah tidak ada di sidebar karena santri sudah resmi diterima.', targetView: 'student-dashboard', targetRole: 'santri' },
+          { id: 't4_5', title: 'Administrasi Keuangan SPP', guide: 'Buka Kas & Keuangan SPP (Admin). Pantau tagihan SPP per jenjang Paket A, B, C dan status pembayaran santri.', targetView: 'finance-admin', targetRole: 'admin' },
+          { id: 't4_6', title: 'Ekspor Data Standar Dapodik', guide: 'Buka menu Sinkronisasi Dapodik (Admin). Klik Ekspor Data Santri (CSV Dapodik) untuk format resmi Kemendikbud.', targetView: 'dapodik-admin', targetRole: 'admin' }
+        ]
+      },
+      t5: {
+        title: 'Tahap 5: Kemitraan Pesantren, Mutu BAN-PDM & Tutor AI',
+        items: [
+          { id: 't5_1', title: 'Portal Kemitraan Pesantren', guide: 'Buka menu Kemitraan Pesantren (Admin). Pantau daftar pondok mitra, kuota santri binaan, dan status MoU.', targetView: 'partner-portal', targetRole: 'admin' },
+          { id: 't5_2', title: 'Peta Persebaran Diaspora Global', guide: 'Buka Persebaran Diaspora (Admin). Visualisasi santri luar negeri dan jam lokal dunia (WIB, WITA, WIT, AST, JST).', targetView: 'diaspora-map', targetRole: 'admin' },
+          { id: 't5_3', title: 'Instrumen Akreditasi BAN-PDM', guide: 'Buka Akreditasi & SOP Mutu. Periksa checklist 8 Standar Nasional Pendidikan dan repositori eviden digital.', targetView: 'quality-accreditation', targetRole: 'admin' },
+          { id: 't5_4', title: 'Balanced Scorecard (BSC) Institusi', guide: 'Buka menu Balanced Scorecard (Admin). Pantau 4 perspektif kinerja institusi PKBM Digital.', targetView: 'quality-bsc', targetRole: 'admin' },
+          { id: 't5_5', title: 'Asisten Pembelajaran Tutor AI 24/7', guide: 'Buka menu Tutor AI 24/7. Tanyakan hukum tajwid atau adab menuntut ilmu untuk verifikasi asisten cerdas.', targetView: 'ai-tutor', targetRole: 'santri' }
+        ]
+      }
+    };
+
+    let activeChecklistTab = 't1';
+
+    function getSavedChecklistState() {
+      try {
+        const raw = localStorage.getItem('pkbm_feature_checklist');
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return {};
+    }
+
+    function saveChecklistState(stateObj) {
+      try {
+        localStorage.setItem('pkbm_feature_checklist', JSON.stringify(stateObj));
+      } catch (e) {}
+    }
+
+    function openFeatureChecklistModal() {
+      openModal('modal-feature-checklist');
+      renderFeatureChecklist();
+    }
+
+    function switchChecklistTab(tabKey) {
+      activeChecklistTab = tabKey;
+      document.querySelectorAll('.checklist-tab').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('chk-tab-' + tabKey);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderFeatureChecklist();
+    }
+
+    function toggleChecklistItem(id, isChecked) {
+      const stateObj = getSavedChecklistState();
+      stateObj[id] = isChecked;
+      saveChecklistState(stateObj);
+      renderFeatureChecklist();
+    }
+
+    function toggleAllChecklist(setVal) {
+      const stateObj = getSavedChecklistState();
+      Object.keys(FEATURE_CHECKLIST_DATA).forEach(tab => {
+        FEATURE_CHECKLIST_DATA[tab].items.forEach(item => {
+          stateObj[item.id] = setVal;
+        });
+      });
+      saveChecklistState(stateObj);
+      renderFeatureChecklist();
+    }
+
+    function quickLoginAs(roleKey) {
+      let u = 'admin';
+      let fullName = 'Administrator Utama';
+      let roleName = 'SUPER_ADMIN';
+
+      if (roleKey === 'tutor') {
+        u = 'tutor'; fullName = 'Ustadz Ahmad Al-Hafizh, Lc.'; roleName = 'TUTOR';
+      } else if (roleKey === 'santri') {
+        u = 'santri'; fullName = 'Muhammad Al-Fatih'; roleName = 'SISWA';
+      } else if (roleKey === 'tamu') {
+        u = 'tamu'; fullName = 'Calon Santri Baru'; roleName = 'GUEST';
+      }
+
+      const mockUser = { username: u, full_name: fullName, role_name: roleName };
+      completeLogin(mockUser);
+      showToast('Beralih peran sebagai: ' + fullName + ' (' + roleName + ')');
+    }
+
+    function navigateFromChecklist(viewKey, roleKey) {
+      closeModal('modal-feature-checklist');
+      quickLoginAs(roleKey);
+      setTimeout(() => {
+        switchView(viewKey);
+      }, 60);
+    }
+
+    function renderFeatureChecklist() {
+      const container = document.getElementById('checklist-content-body');
+      if (!container) return;
+
+      const stateObj = getSavedChecklistState();
+      const tabData = FEATURE_CHECKLIST_DATA[activeChecklistTab];
+
+      // Calculate total progress
+      let totalItems = 0;
+      let checkedItems = 0;
+      Object.keys(FEATURE_CHECKLIST_DATA).forEach(tab => {
+        FEATURE_CHECKLIST_DATA[tab].items.forEach(item => {
+          totalItems++;
+          if (stateObj[item.id]) checkedItems++;
+        });
+      });
+
+      const pct = Math.round((checkedItems / totalItems) * 100);
+      const progBar = document.getElementById('checklist-progress-bar');
+      const progTxt = document.getElementById('checklist-progress-text');
+      const progBadge = document.getElementById('checklist-progress-badge');
+
+      if (progBar) progBar.style.width = pct + '%';
+      if (progTxt) progTxt.innerText = `${checkedItems} dari ${totalItems} Terverifikasi (${pct}%)`;
+      if (progBadge) progBadge.innerText = `${checkedItems}/${totalItems}`;
+
+      container.innerHTML = `
+        <div style="margin-bottom:16px;">
+          <h4 style="font-size:15px; font-weight:800; color:var(--tx); margin:0;">${tabData.title}</h4>
+          <p style="font-size:12px; color:var(--mut); margin:3px 0 0;">Centang item di bawah ini setelah Anda menguji fitur terkait di aplikasi.</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${tabData.items.map(item => {
+            const isChecked = !!stateObj[item.id];
+            return `
+              <div class="check-item-row ${isChecked ? 'checked' : ''}">
+                <input type="checkbox" id="chk_${item.id}" ${isChecked ? 'checked' : ''} onchange="toggleChecklistItem('${item.id}', this.checked)">
+                <div style="flex:1;">
+                  <label for="chk_${item.id}" style="font-size:13px; font-weight:700; color:var(--tx); cursor:pointer; display:block; ${isChecked ? 'text-decoration:line-through; opacity:0.75;' : ''}">
+                    ${item.title}
+                  </label>
+                  <p style="font-size:11.5px; color:var(--mut); margin:4px 0 0; line-height:1.5;">
+                    ${item.guide}
+                  </p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="navigateFromChecklist('${item.targetView}', '${item.targetRole}')" style="white-space:nowrap; font-size:11px; padding:4px 8px;" title="Langsung buka halaman fitur ini">
+                  Uji Fitur Ini &rarr;
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     // MODAL HELPERS & GLOBAL CLOSE LISTENERS (BACKDROP & ESC KEY)
@@ -8406,6 +8641,74 @@
       <button class="btn btn-primary" style="padding:14px 28px; font-size:15px; font-weight:700; width:100%; justify-content:center; border-radius:10px;" onclick="reenterCBTFullscreen()">
         🔒 Kembali ke Layar Penuh (Lanjutkan Ujian)
       </button>
+    </div>
+  </div>
+
+
+  <!-- FLOATING WIDGET: CHECKLIST PENGUJIAN FITUR (TAHAP 1 - 5) -->
+  <div id="checklist-floating-trigger" onclick="openFeatureChecklistModal()" style="position:fixed; bottom:20px; right:20px; z-index:99990; background:linear-gradient(135deg, var(--em), #0f766e); color:#fff; padding:10px 18px; border-radius:30px; box-shadow:0 10px 25px rgba(4,120,87,0.35); display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; font-size:12.5px; border:2px solid rgba(255,255,255,0.2); transition:transform .15s, box-shadow .15s;">
+    <span>📋</span>
+    <span>Checklist Uji Fitur</span>
+    <span id="checklist-progress-badge" style="background:rgba(255,255,255,0.25); padding:2px 8px; border-radius:12px; font-size:11px;">0/28</span>
+  </div>
+
+  <!-- MODAL: CHECKLIST PENGUJIAN FITUR LENGKAP -->
+  <div class="modal-overlay" id="modal-feature-checklist" style="z-index:99995;">
+    <div class="modal-box" style="max-width:840px; width:95%; max-height:88vh; display:flex; flex-direction:column; padding:0; border-radius:18px; overflow:hidden; position:relative;">
+      <!-- Header Checklist -->
+      <div style="padding:20px 24px; background:var(--card); border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="font-size:17px; font-weight:800; color:var(--tx); margin:0;">Checklist Pengujian Fitur PKBM Digital Dar El Iman</h3>
+          <p style="font-size:12px; color:var(--mut); margin:4px 0 0;">Verifikasi pemenuhan teknis Tahap 1 s.d. Tahap 5 sesuai dokumen rancangan resmi.</p>
+        </div>
+        <button type="button" onclick="closeModal('modal-feature-checklist')" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--mut); padding:4px;" title="Tutup Jendela">&times;</button>
+      </div>
+
+      <!-- Quick Role Switcher Bar -->
+      <div style="padding:12px 24px; background:var(--bg); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="font-size:11.5px; font-weight:700; color:var(--mut);">GANTI PERAN CEPAT:</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="quickLoginAs('admin')">Admin</button>
+          <button class="btn btn-outline btn-sm" onclick="quickLoginAs('tutor')">Ustadz</button>
+          <button class="btn btn-outline btn-sm" onclick="quickLoginAs('santri')">Santri</button>
+          <button class="btn btn-outline btn-sm" onclick="quickLoginAs('tamu')">Tamu PPDB</button>
+        </div>
+      </div>
+
+      <!-- Progress Bar Strip -->
+      <div style="padding:10px 24px; background:var(--card); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px;">
+        <div style="flex:1; height:8px; background:var(--bg); border-radius:4px; overflow:hidden; border:1px solid var(--line);">
+          <div id="checklist-progress-bar" style="height:100%; width:0%; background:linear-gradient(90deg, var(--em), #10b981); transition:width .25s;"></div>
+        </div>
+        <div id="checklist-progress-text" style="font-size:12px; font-weight:700; color:var(--em); white-space:nowrap;">
+          0 dari 28 Terverifikasi (0%)
+        </div>
+      </div>
+
+      <!-- Stage Selector Tabs -->
+      <div style="display:flex; border-bottom:1px solid var(--line); background:var(--bg); overflow-x:auto;">
+        <button class="checklist-tab active" onclick="switchChecklistTab('t1')" id="chk-tab-t1">Tahap 1</button>
+        <button class="checklist-tab" onclick="switchChecklistTab('t2')" id="chk-tab-t2">Tahap 2</button>
+        <button class="checklist-tab" onclick="switchChecklistTab('t3')" id="chk-tab-t3">Tahap 3</button>
+        <button class="checklist-tab" onclick="switchChecklistTab('t4')" id="chk-tab-t4">Tahap 4</button>
+        <button class="checklist-tab" onclick="switchChecklistTab('t5')" id="chk-tab-t5">Tahap 5</button>
+      </div>
+
+      <!-- Scrollable Checklist Content -->
+      <div id="checklist-content-body" style="padding:20px 24px; overflow-y:auto; flex:1;">
+        <!-- Injected dynamically via renderFeatureChecklist() -->
+      </div>
+
+      <!-- Footer Actions -->
+      <div style="padding:14px 24px; background:var(--card); border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="toggleAllChecklist(true)">Centang Semua</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleAllChecklist(false)">Reset Centang</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="closeModal('modal-feature-checklist')">
+          Tutup Panduan
+        </button>
+      </div>
     </div>
   </div>
 
