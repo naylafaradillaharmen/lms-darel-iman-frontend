@@ -505,6 +505,10 @@
       padding: 20px;
     }
     .modal-overlay.open { display: grid; }
+    @keyframes modalPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
 
     .modal-box {
       background: var(--card);
@@ -1339,6 +1343,148 @@
                 </table>
               </div>
             </div>
+
+            <!-- MODAL KONFIRMASI SELESAI UJIAN (DI TENGAH LAYAR) -->
+            <div id="modal-cbt-finish" style="display:none; position:fixed; inset:0; z-index:100000; background:rgba(15,23,42,0.72); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+              <div class="card" style="max-width:500px; width:100%; border-radius:18px; box-shadow:0 25px 60px rgba(0,0,0,0.4); border:1px solid var(--line); overflow:hidden; animation:modalPop .2s ease-out; margin:auto;">
+                <!-- Modal Header -->
+                <div style="background:var(--card); padding:26px 24px 16px; text-align:center;">
+                  <div style="width:60px; height:60px; background:linear-gradient(135deg, #fef3c7, #fde68a); color:#d97706; border-radius:50%; display:grid; place-items:center; font-size:28px; margin:0 auto 14px; box-shadow:0 6px 16px rgba(217,119,6,0.25);">
+                    📋
+                  </div>
+                  <h3 style="font-size:18px; font-weight:800; color:var(--tx); margin-bottom:6px;">Konfirmasi Pengumpulan Ujian</h3>
+                  <p style="font-size:13px; color:var(--mut); line-height:1.5; margin:0;">
+                    Apakah Anda yakin telah selesai dan ingin mengirimkan lembar jawaban ujian CBT ini?
+                  </p>
+                </div>
+                
+                <!-- Status Pengerjaan -->
+                <div style="padding:18px 24px; background:var(--bg); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+                  <div style="font-size:11.5px; font-weight:700; color:var(--mut); text-transform:uppercase; margin-bottom:12px; letter-spacing:.05em;">Ringkasan Lembar Jawaban:</div>
+                  <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; text-align:center;">
+                    <div style="background:var(--card); padding:12px 6px; border-radius:12px; border:1px solid rgba(4,120,87,0.2);">
+                      <div id="cbt-summary-answered" style="font-size:22px; font-weight:800; color:var(--em);">0</div>
+                      <div style="font-size:11px; font-weight:600; color:var(--em); margin-top:2px;">Sudah Dijawab</div>
+                    </div>
+                    <div style="background:var(--card); padding:12px 6px; border-radius:12px; border:1px solid rgba(217,119,6,0.2);">
+                      <div id="cbt-summary-ragu" style="font-size:22px; font-weight:800; color:var(--warn);">0</div>
+                      <div style="font-size:11px; font-weight:600; color:var(--warn); margin-top:2px;">Ragu-ragu</div>
+                    </div>
+                    <div style="background:var(--card); padding:12px 6px; border-radius:12px; border:1px solid rgba(220,38,38,0.2);">
+                      <div id="cbt-summary-unanswered" style="font-size:22px; font-weight:800; color:var(--bad);">0</div>
+                      <div style="font-size:11px; font-weight:600; color:var(--bad); margin-top:2px;">Belum Dijawab</div>
+                    </div>
+                  </div>
+                  <div id="cbt-unanswered-warning" style="display:none; margin-top:14px; padding:10px 14px; background:#fef2f2; border:1px solid #fecaca; border-radius:10px; font-size:12px; color:#b91c1c; line-height:1.5;">
+                    ⚠️ <b>Peringatan:</b> Masih ada soal yang belum Anda jawab atau ditandai ragu-ragu. Setelah dikirim, jawaban tidak dapat diperbaiki lagi!
+                  </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div style="padding:16px 24px; background:var(--card); display:flex; justify-content:flex-end; gap:12px;">
+                  <button type="button" class="btn btn-outline" onclick="closeCBTFinishModal()" style="border-radius:10px; font-size:13px; font-weight:600;">
+                    Lanjutkan Mengerjakan
+                  </button>
+                  <button type="button" class="btn btn-primary" onclick="confirmAndSubmitCBT()" style="border-radius:10px; font-size:13px; font-weight:700;">
+                    ✅ Ya, Kirim Jawaban
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CBT RESULT & PEMBAHASAN JAWABAN (REVIEW PAGE) -->
+          <div id="cbt-result-container" style="display:none;">
+            <div class="page-title" style="margin-bottom:20px;">
+              <div>
+                <h1 style="display:flex; align-items:center; gap:10px;">
+                  <span>🎯</span> Hasil & Pembahasan Ujian CBT
+                </h1>
+                <p>UTS Asesmen Sumatif Tahfizh & Tajwid • Muhammad Al-Fatih (NIS-2026-001)</p>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="showCBTGate()">
+                  ⬅️ Kembali ke Portal CBT
+                </button>
+                <button class="btn btn-primary" onclick="restartCBTExam()">
+                  🔄 Ulangi Ujian (Latihan Kembali)
+                </button>
+              </div>
+            </div>
+
+            <!-- SCORE BANNER & STATS -->
+            <div class="card" style="padding:26px; margin-bottom:24px; border-top:5px solid var(--em); position:relative; overflow:hidden;">
+              <div style="display:grid; grid-template-columns: auto 1fr auto; gap:26px; align-items:center;">
+                <!-- BIG BADGE SCORE -->
+                <div style="background:linear-gradient(135deg, #ecfdf5, #d1fae5); border:2px solid var(--em); border-radius:18px; padding:18px 28px; text-align:center; min-width:150px; box-shadow:0 8px 20px rgba(4,120,87,0.12);">
+                  <div style="font-size:11.5px; font-weight:700; color:var(--em); text-transform:uppercase; letter-spacing:.05em;">Nilai Akhir</div>
+                  <div id="cbt-result-score" style="font-size:44px; font-weight:800; color:var(--em); line-height:1.1; margin:6px 0;">
+                    90.91
+                  </div>
+                  <div id="cbt-result-status-badge" class="badge" style="background:var(--em); color:#fff; font-size:11.5px; padding:4px 10px; border-radius:6px; font-weight:700;">
+                    LULUS KKM
+                  </div>
+                </div>
+
+                <!-- DETAIL INFO -->
+                <div>
+                  <h2 style="font-size:18px; font-weight:800; margin-bottom:6px; color:var(--tx);">
+                    Hasil Evaluasi Capaian Pembelajaran
+                  </h2>
+                  <p id="cbt-result-verdict" style="font-size:13px; color:var(--tx); line-height:1.6; margin-bottom:14px;">
+                    Alhamdulillah! Capaian Anda telah memenuhi Kriteria Ketuntasan Minimal (KKM 75.00). Silakan ulas kunci jawaban dan pembahasan di bawah ini untuk mengulang-ulang materi belajar.
+                  </p>
+
+                  <!-- METRICS GRID -->
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px;">
+                    <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 14px;">
+                      <div style="font-size:11px; color:var(--mut);">Total Soal</div>
+                      <div style="font-size:16px; font-weight:800; color:var(--tx);" id="cbt-result-total">11 Soal</div>
+                    </div>
+                    <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 14px;">
+                      <div style="font-size:11px; color:var(--mut);">Jawaban Benar</div>
+                      <div style="font-size:16px; font-weight:800; color:var(--em);" id="cbt-result-correct">10 Soal</div>
+                    </div>
+                    <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 14px;">
+                      <div style="font-size:11px; color:var(--mut);">Jawaban Salah</div>
+                      <div style="font-size:16px; font-weight:800; color:var(--bad);" id="cbt-result-wrong">0 Soal</div>
+                    </div>
+                    <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 14px;">
+                      <div style="font-size:11px; color:var(--mut);">Waktu Selesai</div>
+                      <div style="font-size:13px; font-weight:700; color:var(--tx);" id="cbt-result-time">Hari Ini</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT ACTION BUTTONS -->
+                <div style="display:flex; flex-direction:column; gap:10px; justify-content:center;">
+                  <button class="btn btn-gold" onclick="document.getElementById('cbt-review-section').scrollIntoView({ behavior: 'smooth' })" style="justify-content:center; border-radius:10px; font-size:13px;">
+                    📖 Ulas Jawaban & Kunci
+                  </button>
+                  <button class="btn btn-outline" onclick="switchView('report-card')" style="justify-content:center; border-radius:10px; font-size:13px;">
+                    📜 Buka E-Rapor Semester
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- REVIEW & PEMBAHASAN HEADING -->
+            <div id="cbt-review-section" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h2 style="font-size:17px; font-weight:800; color:var(--tx);">Pembahasan Soal & Kunci Jawaban Lengkap</h2>
+                <p style="font-size:12.5px; color:var(--mut); margin:0;">Telaah kaidah tajwid dan rujukan kitab di bawah ini untuk belajar ulang secara mandiri.</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <span class="badge" style="background:#d1fae5; color:var(--em); font-weight:700;">✅ Benar</span>
+                <span class="badge" style="background:#fee2e2; color:var(--bad); font-weight:700;">❌ Salah</span>
+                <span class="badge" style="background:#fef3c7; color:var(--warn); font-weight:700;">💡 Pembahasan</span>
+              </div>
+            </div>
+
+            <!-- QUESTIONS REVIEW LIST -->
+            <div id="cbt-review-list" style="display:flex; flex-direction:column; gap:18px;">
+              <!-- Injected dynamically via renderCBTReview() -->
+            </div>
           </div>
         </section>
 
@@ -1835,6 +1981,37 @@
                 🚀 Mulai Kerjakan Ujian Sekarang
               </button>
             </div>
+
+            <!-- RIWAYAT UJIAN CBT SAYA (UNTUK BELAJAR ULANG) -->
+            <div class="card" style="max-width:850px; margin:28px auto 0; padding:24px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h3 style="font-size:15px; font-weight:800; color:var(--tx); margin:0;">📚 Riwayat Ujian & Pembahasan CBT Saya</h3>
+                  <p style="font-size:12px; color:var(--mut); margin:2px 0 0;">Daftar asesmen yang pernah diselesaikan. Anda dapat membuka kunci jawaban atau mengulang latihan kapan saja.</p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="renderCBTHistoryTable()">
+                  🔄 Segarkan Riwayat
+                </button>
+              </div>
+
+              <div class="table-container">
+                <table class="data-table" style="font-size:12.5px;">
+                  <thead>
+                    <tr>
+                      <th>Waktu Selesai</th>
+                      <th>Mata Ujian</th>
+                      <th style="text-align:center;">Skor Akhir</th>
+                      <th style="text-align:center;">Status KKM</th>
+                      <th style="text-align:center;">Hasil Soal</th>
+                      <th style="text-align:right;">Aksi Pembahasan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cbt-history-tbody">
+                    <!-- Injected dynamically via renderCBTHistoryTable() -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <!-- 2. ACTIVE EXAM SHEET -->
@@ -1851,7 +2028,7 @@
                 <div style="background:var(--soft); color:var(--em); padding:6px 14px; border-radius:8px; font-weight:800; font-size:16px; border:1px solid var(--em);" id="cbt-timer-badge">
                   ⏱️ 60:00
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="finishCBTExamConfirm()">
+                <button class="btn btn-primary btn-sm" onclick="openCBTFinishModal()">
                   ✅ Selesai & Kirim Ujian
                 </button>
               </div>
@@ -5081,6 +5258,7 @@
       `).join('');
 
       // Tahap 4 Views Rendering
+      if (typeof renderCBTHistoryTable === 'function') renderCBTHistoryTable();
       if (typeof renderPPDBAdmin === 'function') renderPPDBAdmin();
       if (typeof renderFinanceViews === 'function') renderFinanceViews();
       if (typeof renderDapodikViews === 'function') renderDapodikViews();
@@ -5758,7 +5936,8 @@
       cbtData.timerInterval = setInterval(() => {
         if (cbtData.timerSeconds <= 0) {
           clearInterval(cbtData.timerInterval);
-          finishCBTExamConfirm();
+          showToast("Waktu ujian telah berakhir! Lembar jawaban otomatis dikumpulkan.");
+          confirmAndSubmitCBT(true);
           return;
         }
         cbtData.timerSeconds--;
@@ -5890,12 +6069,191 @@
       showToast(cbtData.raguRagu[q.id] ? 'Soal ditandai ragu-ragu.' : 'Tanda ragu-ragu dilepas.');
     }
 
-    async function finishCBTExamConfirm() {
-      if (!confirm('Apakah Anda yakin telah selesai dan ingin mengirimkan lembar jawaban ujian CBT?')) {
+    
+    // =========================================================================
+    // KUNCI JAWABAN & PEMBAHASAN RESMI CBT TAHFIZH & TAJWID (UNTUK BELAJAR ULANG)
+    // =========================================================================
+    const cbtAnswerKeys = {
+      q1: {
+        correctKey: 'A',
+        correctOptId: 'opt1_1',
+        explanation: 'Secara bahasa, Tajwid (تجويد) bermakna At-Tahsin (التحسين) yaitu membaguskan atau memperindah. Secara istilah syar\'i, Tajwid adalah mengeluarkan setiap huruf hijaiyyah dari makhraj aslinya dengan memberikan hak dan mustahaq-nya.'
+      },
+      q2: {
+        correctKey: 'B',
+        correctOptId: 'opt2_2',
+        explanation: 'Menurut pendapat yang dipilih oleh Al-Imam Ibnu Al-Jazari dan Al-Khalil bin Ahmad Al-Farahidi (jumhur ulama tajwid), makhraj umum terbagi menjadi 5 tempat (Al-Jauf, Al-Halq, Al-Lisan, Asy-Syafatain, Al-Khaisyum) yang mencakup 17 makhraj khusus.'
+      },
+      q3: {
+        correctKey: 'A',
+        correctOptId: 'opt3_1',
+        explanation: 'Huruf halqiyyah (tenggorokan) berjumlah 6 huruf yang terbagi di 3 area: Pangkal tenggorokan / Aqshal Halq (ء، هـ), Tengah tenggorokan / Wasathul Halq (ع، ح), dan Ujung tenggorokan / Adnal Halq (غ، خ).'
+      },
+      q4: {
+        correctKey: 'B',
+        correctOptId: 'opt4_2',
+        explanation: 'Hukum bacaan Nun Mati/Tanwin bertemu Ba (ب) adalah Iqlab (إقلاب), yang maknanya membalikkan/mengganti bunyi nun mati menjadi suara mim (م) yang disertai dengung (ghunnah 2 harakat).'
+      },
+      q5: {
+        correctKey: 'B',
+        correctOptId: 'opt5_2',
+        explanation: 'Surah An-Naba\' (Surah ke-78) terdiri atas 40 ayat dan tergolong surah Makkiyyah, merupakan surah pembuka dari Juz 30 (Juz \'Amma).'
+      },
+      q6: {
+        correctKey: 'A',
+        correctOptId: 'opt6_1',
+        explanation: 'Huruf Mim bertasydid (serta Nun bertasydid) memiliki tingkatan ghunnah tertinggi yaitu Ghunnah Akmal ma Takun (paling sempurna dengungnya) yang ditahan sepanjang 2 harakat.'
+      },
+      q7: {
+        correctKey: 'A',
+        correctOptId: 'opt7_1',
+        explanation: 'Huruf Qalqalah (pantulan suara) terangkum dalam bait quthbu jaddin (ق، ط، ب، ج، د) atau yang sering disingkat "Baju Di Toko".'
+      },
+      q8: {
+        correctKey: 'A',
+        correctOptId: 'opt8_1',
+        explanation: 'Sifat-sifat huruf yang memiliki lawan kata adalah Hams (nafas mengalir) lawannya Jahr (nafas tertahan), Syiddah (suara tertahan) lawannya Rakhawah, Isti\'la lawannya Istifal, Ithbaq lawannya Infitah, dan Idzlaq lawannya Ishmat.'
+      },
+      q9: {
+        correctKey: 'A',
+        correctOptId: 'opt9_1',
+        explanation: 'Mad Lazim Mutsaqqal Kilmi wajib dibaca panjang dengan kadar thul (panjang maksimal) yaitu 6 harakat (setara 3 alif).'
+      },
+      q10: {
+        correctKey: 'A',
+        correctOptId: 'opt10_1',
+        explanation: 'Adab batin terpenting dalam menghafal dan membaca Al-Qur\'an adalah ikhlas karena Allah semata dan tawadhu\' (rendah hati), sebagaimana dicontohkan oleh para Salafus Shalih dan Ulama Ahlussunnah.'
+      },
+      q11: {
+        correctKey: 'ESSAY',
+        keyPoints: '1) Al-Jauf: Rongga mulut & tenggorokan tempat keluarnya 3 huruf mad (Alif, Wawu, Ya sukun). 2) Al-Halq: Tenggorokan tempat keluarnya 6 huruf halqiyyah (Hamzah, Ha, Ain, Haa, Ghain, Kho).',
+        explanation: 'Perbedaan mendasar: Al-Jauf adalah rongga udara terbuka dari dada hingga mulut yang menghasilkan 3 huruf mad (makhraj muqaddar/perkiraan). Sedangkan Al-Halq adalah tenggorokan fisik berotot (makhraj muhaqqaq/pasti) yang dibagi menjadi pangkal, tengah, dan ujung tenggorokan untuk 6 huruf halqiyyah.'
+      }
+    };
+
+    function getCBTHistory() {
+      try {
+        const raw = localStorage.getItem('pkbm_cbt_history');
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return [
+        {
+          id: 'cbt-hist-demo-1',
+          date: '08 Okt 2026',
+          time: '10:15 WIB',
+          examName: 'Simulasi Mandiri UTS Tahfizh & Tajwid',
+          score: 82,
+          totalQuestions: 11,
+          correctCount: 9,
+          wrongCount: 1,
+          essayAnswered: true,
+          userAnswers: {
+            q1: { optId: 'opt1_1', optKey: 'A' },
+            q2: { optId: 'opt2_2', optKey: 'B' },
+            q3: { optId: 'opt3_1', optKey: 'A' },
+            q4: { optId: 'opt4_2', optKey: 'B' },
+            q5: { optId: 'opt5_1', optKey: 'A' },
+            q6: { optId: 'opt6_1', optKey: 'A' },
+            q7: { optId: 'opt7_1', optKey: 'A' },
+            q8: { optId: 'opt8_1', optKey: 'A' },
+            q9: { optId: 'opt9_1', optKey: 'A' },
+            q10: { optId: 'opt10_1', optKey: 'A' },
+            q11: { essay: 'Al-Jauf adalah rongga mulut & tenggorokan tempat huruf mad. Al-Halq adalah tenggorokan untuk 6 huruf halqiyyah.' }
+          },
+          passed: true
+        }
+      ];
+    }
+
+    function saveCBTHistoryItem(item) {
+      const hist = getCBTHistory();
+      hist.unshift(item);
+      try {
+        localStorage.setItem('pkbm_cbt_history', JSON.stringify(hist));
+      } catch (e) {}
+    }
+
+    function renderCBTHistoryTable() {
+      const tbody = document.getElementById('cbt-history-tbody');
+      if (!tbody) return;
+      const history = getCBTHistory();
+      if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--mut); padding:20px;">Belum ada riwayat ujian CBT yang diselesaikan.</td></tr>';
         return;
       }
+      tbody.innerHTML = history.map((h, idx) => {
+        const isPass = h.score >= 75;
+        return `
+          <tr>
+            <td>
+              <b>${h.date}</b><br>
+              <small style="color:var(--mut);">${h.time}</small>
+            </td>
+            <td>
+              <b>${h.examName}</b><br>
+              <span style="font-size:11px; color:var(--mut);">11 Soal (10 PG, 1 Esai)</span>
+            </td>
+            <td style="text-align:center;">
+              <span style="font-size:16px; font-weight:800; color:${isPass ? 'var(--em)' : 'var(--bad)'};">${h.score}</span>
+              <span style="font-size:11px; color:var(--mut);">/ 100</span>
+            </td>
+            <td style="text-align:center;">
+              <span class="badge" style="background:${isPass ? '#d1fae5' : '#fee2e2'}; color:${isPass ? 'var(--em)' : 'var(--bad)'}; font-weight:700;">
+                ${isPass ? 'LULUS KKM' : 'REMEDIAL'}
+              </span>
+            </td>
+            <td style="text-align:center; font-size:12px;">
+              <span style="color:var(--em); font-weight:700;">${h.correctCount} Benar</span> • 
+              <span style="color:var(--bad); font-weight:600;">${h.wrongCount || 0} Salah</span>
+            </td>
+            <td style="text-align:right;">
+              <div style="display:inline-flex; gap:6px;">
+                <button class="btn btn-gold btn-sm" onclick="reviewHistoryAttempt('${h.id}')" title="Buka Kunci Jawaban & Pembahasan">
+                  📖 Pembahasan
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="restartCBTExam()" title="Ulangi Latihan Ujian Ini">
+                  🔄 Ulangi
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
 
-      clearInterval(cbtData.timerInterval);
+    function openCBTFinishModal() {
+      let answered = 0;
+      cbtData.questions.forEach(q => {
+        const ans = cbtData.userAnswers[q.id];
+        if (q.type === 'MULTIPLE_CHOICE' && ans && ans.optId) answered++;
+        if (q.type === 'ESSAY' && ans && ans.essay && ans.essay.trim().length > 0) answered++;
+      });
+      const ragu = Object.values(cbtData.raguRagu).filter(Boolean).length;
+      const unanswered = cbtData.questions.length - answered;
+
+      const elAns = document.getElementById('cbt-summary-answered');
+      const elRagu = document.getElementById('cbt-summary-ragu');
+      const elUnans = document.getElementById('cbt-summary-unanswered');
+      const elWarn = document.getElementById('cbt-unanswered-warning');
+
+      if (elAns) elAns.innerText = `${answered} / ${cbtData.questions.length}`;
+      if (elRagu) elRagu.innerText = ragu;
+      if (elUnans) elUnans.innerText = unanswered;
+      if (elWarn) elWarn.style.display = (unanswered > 0 || ragu > 0) ? 'block' : 'none';
+
+      const modal = document.getElementById('modal-cbt-finish');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeCBTFinishModal() {
+      const modal = document.getElementById('modal-cbt-finish');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function confirmAndSubmitCBT(isTimeOut = false) {
+      closeCBTFinishModal();
+
+      if (cbtData.timerInterval) clearInterval(cbtData.timerInterval);
       cbtData.activeEvent = null;
       window.removeEventListener('beforeunload', cbtBeforeUnloadWarning);
 
@@ -5912,18 +6270,251 @@
         document.exitFullscreen().catch(() => {});
       }
 
+      // Hitung skor akurat
+      let correctCount = 0;
+      let wrongCount = 0;
+      let essayAnswered = false;
+
+      cbtData.questions.forEach(q => {
+        const ans = cbtData.userAnswers[q.id];
+        if (q.type === 'MULTIPLE_CHOICE') {
+          const key = cbtAnswerKeys[q.id];
+          if (ans && ans.optId && key && ans.optId === key.correctOptId) {
+            correctCount++;
+          } else if (ans && ans.optId) {
+            wrongCount++;
+          }
+        } else if (q.type === 'ESSAY') {
+          if (ans && ans.essay && ans.essay.trim().length > 0) {
+            essayAnswered = true;
+          }
+        }
+      });
+
+      // 10 soal PG masing-masing 9 poin + Esai 10 poin = 100
+      const score = Math.min(100, (correctCount * 9) + (essayAnswered ? 10 : 0));
+      const isPassed = score >= 75;
+
+      const now = new Date();
+      const attempt = {
+        id: 'cbt-att-' + Date.now(),
+        date: now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        time: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+        examName: 'UTS Tahfizh & Tajwid',
+        score: score,
+        totalQuestions: cbtData.questions.length,
+        correctCount: correctCount,
+        wrongCount: wrongCount,
+        essayAnswered: essayAnswered,
+        userAnswers: JSON.parse(JSON.stringify(cbtData.userAnswers)),
+        passed: isPassed
+      };
+
+      saveCBTHistoryItem(attempt);
+
       try {
         await fetch(`${API_BASE}/exams/attempts/${cbtData.attemptId}/finish`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score: score, passed: isPassed })
         });
       } catch (e) {}
 
-      document.getElementById('cbt-gate-container').style.display = 'block';
+      // Tampilkan Result & Review Pembahasan
+      const gate = document.getElementById('cbt-gate-container');
+      if (gate) gate.style.display = 'none';
 
-      showToast('Alhamdulillah, ujian CBT berhasil diselesaikan! Skor Anda: 92.00 (Lulus KKM).');
-      switchView('report-card');
+      const resCont = document.getElementById('cbt-result-container');
+      if (resCont) {
+        resCont.style.display = 'block';
+        renderCBTReview(attempt);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      showToast(`Alhamdulillah, ujian selesai! Skor Anda: ${score} / 100 (${isPassed ? 'Lulus KKM' : 'Perlu Remedial'})`);
     }
+
+    function renderCBTReview(attempt) {
+      if (!attempt) return;
+
+      const scoreEl = document.getElementById('cbt-result-score');
+      const badgeEl = document.getElementById('cbt-result-status-badge');
+      const verdictEl = document.getElementById('cbt-result-verdict');
+      const totalEl = document.getElementById('cbt-result-total');
+      const correctEl = document.getElementById('cbt-result-correct');
+      const wrongEl = document.getElementById('cbt-result-wrong');
+      const timeEl = document.getElementById('cbt-result-time');
+
+      if (scoreEl) scoreEl.innerText = attempt.score;
+      if (badgeEl) {
+        if (attempt.passed) {
+          badgeEl.innerText = 'LULUS KKM (75.00)';
+          badgeEl.style.background = 'var(--em)';
+        } else {
+          badgeEl.innerText = 'BELUM LULUS (REMEDIAL)';
+          badgeEl.style.background = 'var(--bad)';
+        }
+      }
+
+      if (verdictEl) {
+        verdictEl.innerText = attempt.passed
+          ? 'Alhamdulillah! Nilai Anda telah memenuhi Kriteria Ketuntasan Minimal (KKM 75.00). Silakan telaah kunci jawaban dan pembahasan ilmiah di bawah untuk mengulang-ulang materi tajwid.'
+          : 'Nilai ujian Anda saat ini masih berada di bawah ambang batas KKM 75.00. Sangat disarankan untuk mempelajari pembahasan kunci jawaban di bawah ini dan mengulang latihan ujian secara mandiri.';
+      }
+
+      if (totalEl) totalEl.innerText = `${attempt.totalQuestions} Soal`;
+      if (correctEl) correctEl.innerText = `${attempt.correctCount} Soal`;
+      if (wrongEl) wrongEl.innerText = `${attempt.wrongCount} Soal`;
+      if (timeEl) timeEl.innerText = `${attempt.date} ${attempt.time}`;
+
+      // Render Soal per Soal Pembahasan
+      const reviewList = document.getElementById('cbt-review-list');
+      if (!reviewList) return;
+
+      reviewList.innerHTML = cbtData.questions.map((q, idx) => {
+        const userAns = attempt.userAnswers[q.id];
+        const keyInfo = cbtAnswerKeys[q.id] || {};
+
+        let isCorrect = false;
+        let isAnswered = false;
+
+        if (q.type === 'MULTIPLE_CHOICE') {
+          isAnswered = !!(userAns && userAns.optId);
+          isCorrect = isAnswered && (userAns.optId === keyInfo.correctOptId);
+        } else {
+          isAnswered = !!(userAns && userAns.essay && userAns.essay.trim().length > 0);
+          isCorrect = isAnswered; // Esai dinilai ustadz / terjawab
+        }
+
+        let badgeHtml = '';
+        if (!isAnswered) {
+          badgeHtml = '<span class="badge" style="background:#f3f4f6; color:#4b5563; font-weight:700;">⚪ Tidak Dijawab</span>';
+        } else if (isCorrect) {
+          badgeHtml = '<span class="badge" style="background:#d1fae5; color:var(--em); font-weight:700;">✅ Jawaban Anda Benar</span>';
+        } else {
+          badgeHtml = '<span class="badge" style="background:#fee2e2; color:var(--bad); font-weight:700;">❌ Jawaban Anda Salah</span>';
+        }
+
+        let optionsHtml = '';
+        if (q.type === 'MULTIPLE_CHOICE') {
+          optionsHtml = q.options.map(opt => {
+            const isUserPick = userAns && userAns.optId === opt.id;
+            const isKey = keyInfo.correctOptId === opt.id;
+
+            let borderStyle = 'border:1px solid var(--line); background:var(--bg);';
+            let pillBadge = '';
+
+            if (isKey) {
+              borderStyle = 'border:2px solid var(--em); background:rgba(4,120,87,0.08);';
+              pillBadge = '<span class="badge" style="background:var(--em); color:#fff; font-size:11px; margin-left:auto;">🔑 Kunci Jawaban Benar</span>';
+            }
+
+            if (isUserPick && !isKey) {
+              borderStyle = 'border:2px solid var(--bad); background:rgba(220,38,38,0.08);';
+              pillBadge = '<span class="badge" style="background:var(--bad); color:#fff; font-size:11px; margin-left:auto;">❌ Pilihan Anda (Salah)</span>';
+            } else if (isUserPick && isKey) {
+              pillBadge = '<span class="badge" style="background:var(--em); color:#fff; font-size:11px; margin-left:auto;">✅ Jawaban Anda Tepat</span>';
+            }
+
+            return `
+              <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; margin-bottom:8px; ${borderStyle}">
+                <div style="width:28px; height:28px; border-radius:50%; background:${isKey ? 'var(--em)' : (isUserPick ? 'var(--bad)' : 'var(--card)')}; color:${(isKey || isUserPick) ? '#fff' : 'var(--tx)'}; display:grid; place-items:center; font-weight:700; font-size:12px; flex-shrink:0;">
+                  ${opt.key}
+                </div>
+                <div style="font-size:13px; line-height:1.5; color:var(--tx); flex:1;">
+                  ${opt.text}
+                </div>
+                ${pillBadge}
+              </div>
+            `;
+          }).join('');
+        } else {
+          // Esai
+          optionsHtml = `
+            <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:11.5px; font-weight:700; color:var(--mut); margin-bottom:4px;">JAWABAN YANG ANDA TULIS:</div>
+              <div style="font-size:13px; color:var(--tx); line-height:1.6; font-style:italic;">
+                ${(userAns && userAns.essay) ? userAns.essay : '<span style="color:var(--bad);">(Lembar jawaban esai dikosongkan)</span>'}
+              </div>
+            </div>
+            <div style="background:rgba(4,120,87,0.06); border:1px solid var(--em); border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:11.5px; font-weight:700; color:var(--em); margin-bottom:4px;">🔑 POIN KUNCI JAWABAN RUJUKAN USTADZ:</div>
+              <div style="font-size:13px; color:var(--tx); line-height:1.6;">
+                ${keyInfo.keyPoints || ''}
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="card" style="padding:22px; border-left:4px solid ${isCorrect ? 'var(--em)' : (isAnswered ? 'var(--bad)' : 'var(--line)')};">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:8px;">
+              <span style="font-size:14px; font-weight:800; color:var(--tx);">
+                Soal Nomor ${idx + 1} dari ${cbtData.questions.length} (${q.type === 'ESSAY' ? 'Esai Uraian' : 'Pilihan Ganda'})
+              </span>
+              ${badgeHtml}
+            </div>
+
+            <div style="font-size:14px; font-weight:600; line-height:1.6; margin-bottom:16px; color:var(--tx);">
+              ${q.prompt}
+            </div>
+
+            ${optionsHtml}
+
+            <!-- KOTAK PEMBAHASAN MATERI & RUJUKAN -->
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:14px 16px; margin-top:14px;">
+              <div style="font-size:12px; font-weight:800; color:#b45309; display:flex; align-items:center; gap:6px; margin-bottom:5px;">
+                <span>💡</span> Pembahasan Materi & Rujukan Kaidah Tajwid:
+              </div>
+              <div style="font-size:12.5px; color:#78350f; line-height:1.6;">
+                ${keyInfo.explanation || 'Pelajari bab terkait pada materi Tahsin & Tajwid.'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function reviewHistoryAttempt(histId) {
+      const history = getCBTHistory();
+      const attempt = history.find(h => h.id === histId) || history[0];
+      if (!attempt) {
+        showToast('Riwayat tidak ditemukan');
+        return;
+      }
+
+      const gate = document.getElementById('cbt-gate-container');
+      const active = document.getElementById('cbt-active-container');
+      const resCont = document.getElementById('cbt-result-container');
+
+      if (gate) gate.style.display = 'none';
+      if (active) active.style.display = 'none';
+      if (resCont) {
+        resCont.style.display = 'block';
+        renderCBTReview(attempt);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function showCBTGate() {
+      const gate = document.getElementById('cbt-gate-container');
+      const active = document.getElementById('cbt-active-container');
+      const resCont = document.getElementById('cbt-result-container');
+
+      if (resCont) resCont.style.display = 'none';
+      if (active) active.style.display = 'none';
+      if (gate) {
+        gate.style.display = 'block';
+        renderCBTHistoryTable();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function restartCBTExam() {
+      showCBTGate();
+      startCBTExamFlow();
+    }
+
 
 
     function reenterCBTFullscreen() {
