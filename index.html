@@ -4403,6 +4403,7 @@
       document.getElementById('header-avatar').innerText = (user.full_name || 'U')[0].toUpperCase();
 
       setupRoleNavigation(user.role_name);
+      renderAllViews(); // Pastikan seluruh tabel dan tombol aksi dirender ulang sesuai hak akses role login!
       showToast(`Ahlan wa Sahlan, ${user.full_name} (${user.role_name})`);
     }
 
@@ -4619,6 +4620,11 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
+      // Re-render data dinamis setiap kali berpindah view agar selalu sinkron dengan role
+      if (viewKey === 'admin-schedules' || viewKey === 'admin-tahfizh' || viewKey.includes('lms')) {
+        renderAllViews();
+      }
+
       const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => {
         const txt = b.innerText.toLowerCase();
         return txt.includes(viewKey.replace('admin-', '').replace('tutor-', '').replace('student-', '').replace('-dashboard', ''));
@@ -4644,6 +4650,7 @@
     function logout() {
       state.user = null;
       state.token = null;
+      renderAllViews();
       document.getElementById('app-container').style.display = 'none';
       document.getElementById('login-screen').style.display = 'flex';
       showToast('Sesi telah diakhiri.');
@@ -4813,22 +4820,28 @@
         </tr>
       `).join('');
 
-      // 6. Schedules Table with Dynamic Meet Status & Role Control
-      const isStu = state.user?.role_name === 'SISWA';
+      // 6. Schedules Table with Strict Role-Based Meet Actions
+      const userRole = state.user?.role_name || '';
+      // Hanya Tutor / Pengajar dan Admin/Operator yang boleh mengatur link Meet!
+      const canManageMeet = (userRole === 'TUTOR' || userRole === 'SUPER_ADMIN' || userRole === 'OPERATOR');
+
       document.getElementById('schedules-table-body').innerHTML = state.schedules.map(sch => {
-        const hasMeet = sch.link && sch.link.trim() !== '' && sch.link !== '#';
+        const hasMeet = Boolean(sch.link && sch.link.trim() !== '' && sch.link !== '#');
         let actionHtml = '';
 
         if (hasMeet) {
+          // Santri HANYA melihat tombol Gabung Meet
           actionHtml = `<a href="${sch.link}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none;">🎥 Gabung Meet</a>`;
-          if (!isStu) {
+          // Hanya Ustadz/Admin yang memiliki tombol edit ✏️
+          if (canManageMeet) {
             actionHtml += ` <button class="btn btn-outline btn-sm" onclick="promptSetMeetLink('${sch.id}')" title="Ubah Link Meet" style="padding:4px 7px;">✏️</button>`;
           }
         } else {
-          if (isStu) {
-            actionHtml = `<span class="tag-pill" style="background:var(--bg); color:var(--mut); border:1px dashed var(--line); font-size:11px; padding:4px 8px; font-weight:500;">⏳ Belum Ada Link Meet</span>`;
-          } else {
+          // Jika belum ada link: Ustadz/Admin melihat tombol penyediaan link, Santri HANYA melihat teks penanda!
+          if (canManageMeet) {
             actionHtml = `<button class="btn btn-gold btn-sm" onclick="promptSetMeetLink('${sch.id}')">+ Sediakan Link</button>`;
+          } else {
+            actionHtml = `<span class="tag-pill" style="background:var(--card); color:var(--mut); border:1px dashed var(--line); font-size:11.5px; padding:4px 9px; font-weight:500; display:inline-flex; align-items:center; gap:4px;">⏳ Belum Ada Link Meet</span>`;
           }
         }
 
@@ -5131,6 +5144,11 @@
     }
 
     function promptSetMeetLink(scheduleId) {
+      const userRole = state.user?.role_name || '';
+      if (userRole !== 'TUTOR' && userRole !== 'SUPER_ADMIN' && userRole !== 'OPERATOR') {
+        showToast('Akses ditolak: Santri tidak berwenang mengatur link pertemuan Google Meet.', 'warn');
+        return;
+      }
       const sch = state.schedules.find(s => s.id === scheduleId) || state.schedules[0];
       const current = sch?.link || '';
       const newLink = prompt(`Masukkan Link Google Meet untuk mata pelajaran ${sch?.subject || 'ini'}:\n(Contoh: https://meet.google.com/abc-defg-hij)`, current);
