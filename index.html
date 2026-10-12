@@ -4035,7 +4035,10 @@
 
   <!-- MODAL: VERIFIKASI QR RAPOR PUBLIK (TAHAP 3) -->
   <div class="modal-overlay" id="modal-verify-qr">
-    <div class="modal-box" style="text-align:center; max-width:480px;">
+    <div class="modal-box" style="text-align:center; max-width:480px; position:relative;">
+      <!-- Tombol Close Silang di Pojok Kanan Atas -->
+      <button type="button" onclick="closeModal('modal-verify-qr')" style="position:absolute; top:14px; right:16px; background:transparent; border:none; font-size:24px; cursor:pointer; color:var(--mut); line-height:1; padding:4px;" title="Tutup Jendela">&times;</button>
+
       <div style="width:60px; height:60px; background:#dcfce7; border:2px solid #22c55e; color:#15803d; border-radius:50%; display:grid; place-items:center; font-size:28px; margin:0 auto 14px;">
         ✓
       </div>
@@ -4045,7 +4048,7 @@
       <h3 style="margin-top:10px; font-size:17px; font-weight:800;">Verifikasi Keabsahan E-Rapor Digital</h3>
       <p style="color:var(--mut); font-size:12px; margin-bottom:16px;">PKBM Digital Dar El Iman Padang (NPSN: P9997123)</p>
 
-      <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:left; font-size:12px; line-height:1.7; margin-bottom:16px;">
+      <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:left; font-size:12px; line-height:1.7; margin-bottom:18px;">
         <div>Nomor Kode Dokumen : <b id="vr-code">DEI-RAPOR-2026-X-001</b></div>
         <div>Nama Lengkap Santri  : <b id="vr-name">Muhammad Al-Fatih</b></div>
         <div>NIS / NISN           : <span id="vr-nis">NIS-2026-001 / 0089218291</span></div>
@@ -4053,6 +4056,13 @@
         <div>Capaian Tahfizh      : <b style="color:var(--em);" id="vr-tahfizh">Juz 30 (Mumtaz)</b></div>
         <div>Status Dokumen       : <b style="color:#15803d;">Tercatat Resmi di Pangkalan Data Lembaga</b></div>
       </div>
+
+      <!-- Tombol Tutup Jelas di Bawah -->
+      <button type="button" class="btn btn-outline" style="width:100%; justify-content:center; border-radius:10px; font-weight:600; padding:10px;" onclick="closeModal('modal-verify-qr')">
+        ✕ Tutup Jendela Verifikasi
+      </button>
+    </div>
+  </div>
 
   <!-- MODAL: PPDB DETAIL & VERIFIKASI (TAHAP 4) -->
   <div class="modal-overlay" id="modal-ppdb-detail">
@@ -4525,6 +4535,26 @@
       populateDropdowns();
       fetchInitialData();
       renderAllViews();
+
+      // AUTO-RESTORE LOGIN SESSION SAAT REFRESH HALAMAN (TETAP LOGIN)
+      try {
+        const savedUserStr = localStorage.getItem('pkbm_auth_user');
+        if (savedUserStr) {
+          const savedUser = JSON.parse(savedUserStr);
+          const savedToken = localStorage.getItem('pkbm_auth_token');
+          state.user = savedUser;
+          if (savedToken) state.token = savedToken;
+          completeLogin(savedUser, savedToken);
+
+          // Pulihkan halaman/view yang sedang dibuka sebelumnya
+          const savedView = localStorage.getItem('pkbm_active_view');
+          if (savedView) {
+            setTimeout(() => switchView(savedView), 30);
+          }
+        }
+      } catch (e) {
+        console.warn('Gagal memulihkan sesi login:', e);
+      }
     });
 
     function showToast(msg) {
@@ -4572,7 +4602,15 @@
       completeLogin(state.user);
     }
 
-    function completeLogin(user) {
+    function completeLogin(user, token = null) {
+      state.user = user;
+      if (token) state.token = token;
+
+      try {
+        localStorage.setItem('pkbm_auth_user', JSON.stringify(user));
+        if (state.token) localStorage.setItem('pkbm_auth_token', state.token);
+      } catch (e) {}
+
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-container').style.display = 'flex';
       document.getElementById('header-name').innerText = user.full_name;
@@ -4580,8 +4618,7 @@
       document.getElementById('header-avatar').innerText = (user.full_name || 'U')[0].toUpperCase();
 
       setupRoleNavigation(user.role_name);
-      renderAllViews(); // Pastikan seluruh tabel dan tombol aksi dirender ulang sesuai hak akses role login!
-      showToast(`Ahlan wa Sahlan, ${user.full_name} (${user.role_name})`);
+      renderAllViews();
     }
 
     function setupRoleNavigation(role) {
@@ -4802,6 +4839,10 @@
         return txt.includes(viewKey.replace('admin-', '').replace('tutor-', '').replace('student-', '').replace('-dashboard', ''));
       });
       if (activeBtn) activeBtn.classList.add('active');
+
+      try {
+        localStorage.setItem('pkbm_active_view', viewKey);
+      } catch (e) {}
     }
 
     function switchLMSTab(role, tabKey) {
@@ -4822,6 +4863,11 @@
     function logout() {
       state.user = null;
       state.token = null;
+      try {
+        localStorage.removeItem('pkbm_auth_user');
+        localStorage.removeItem('pkbm_auth_token');
+        localStorage.removeItem('pkbm_active_view');
+      } catch (e) {}
       renderAllViews();
       document.getElementById('app-container').style.display = 'none';
       document.getElementById('login-screen').style.display = 'flex';
@@ -5336,7 +5382,21 @@
       }
     }
 
-    // MODAL HELPERS
+    // MODAL HELPERS & GLOBAL CLOSE LISTENERS (BACKDROP & ESC KEY)
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+        const finishModal = document.getElementById('modal-cbt-finish');
+        if (finishModal) finishModal.style.display = 'none';
+      }
+    });
+
     function openModal(id) {
       if (id === 'modal-tahfizh-group' && (state.user?.role_name === 'SISWA' || state.user?.role_name === 'TUTOR')) {
         showToast('Pembentukan kelompok halaqah hanya dapat dilakukan oleh Administrator.', 'warn');
