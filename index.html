@@ -1849,7 +1849,7 @@
               <!-- COUNTDOWN TIMER -->
               <div style="display:flex; align-items:center; gap:14px;">
                 <div style="background:var(--soft); color:var(--em); padding:6px 14px; border-radius:8px; font-weight:800; font-size:16px; border:1px solid var(--em);" id="cbt-timer-badge">
-                  ⏱️ 58:24
+                  ⏱️ 60:00
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="finishCBTExamConfirm()">
                   ✅ Selesai & Kirim Ujian
@@ -5617,7 +5617,7 @@
       currentIndex: 0,
       userAnswers: {},
       raguRagu: {},
-      timerSeconds: 3504, // 58 mins 24 secs
+      timerSeconds: 3600, // 60 mins
       timerInterval: null,
       incidentCount: 0,
       questions: [
@@ -5718,18 +5718,7 @@
       ]
     };
 
-    // Pre-seed default answers for demo
-    cbtData.userAnswers['q1'] = { optId: 'opt1_1', key: 'A' };
-    cbtData.userAnswers['q2'] = { optId: 'opt2_2', key: 'B' };
-    cbtData.userAnswers['q3'] = { optId: 'opt3_1', key: 'A' };
-    cbtData.userAnswers['q4'] = { optId: 'opt4_2', key: 'B' };
-    cbtData.userAnswers['q5'] = { optId: 'opt5_2', key: 'B' };
-    cbtData.userAnswers['q6'] = { optId: 'opt6_1', key: 'A' };
-    cbtData.userAnswers['q7'] = { optId: 'opt7_1', key: 'A' };
-    cbtData.userAnswers['q8'] = { optId: 'opt8_1', key: 'A' };
-    cbtData.userAnswers['q9'] = { optId: 'opt9_1', key: 'A' };
-    cbtData.userAnswers['q10'] = { optId: 'opt10_1', key: 'A' };
-    cbtData.userAnswers['q11'] = { essay: 'Makhraj Al-Jauf adalah rongga mulut dan tenggorokan tempat keluarnya huruf mad (Alif, Wawu, Ya sukun). Sedangkan Al-Halq adalah tenggorokan khusus tempat keluarnya 6 huruf halqiyyah.' };
+    // Lembar jawaban santri dimulai dalam kondisi kosong bersih (belum dijawab)
 
     function startCBTExamFlow() {
       const token = document.getElementById('cbt-token-input').value.trim();
@@ -5739,6 +5728,12 @@
       }
 
       cbtData.activeEvent = 'ee000001-0000-0000-0000-000000000001';
+      cbtData.userAnswers = {};
+      cbtData.raguRagu = {};
+      cbtData.currentIndex = 0;
+      cbtData.timerSeconds = 3600; // 60 menit
+      const autosaveInd = document.getElementById('cbt-autosave-indicator');
+      if (autosaveInd) autosaveInd.innerText = '💾 Tersimpan otomatis';
       document.getElementById('cbt-gate-container').style.display = 'none';
       const cbtActive = document.getElementById('cbt-active-container');
       cbtActive.style.display = 'block';
