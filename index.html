@@ -4701,7 +4701,18 @@
       currentTzIdx: 0
     };
 
-    const API_BASE = 'http://localhost:8080/api/v1';
+    // Deteksi cerdas URL backend: jika diakses via domain produksi/reverse proxy atau docker port 80, gunakan relative path '/api/v1'
+    const API_BASE = (function() {
+      if (typeof window !== 'undefined' && window.PKBM_API_BASE) return window.PKBM_API_BASE;
+      if (typeof window !== 'undefined' && window.location) {
+        const isDevPort = ['8080', '5500', '3000', '5173'].includes(window.location.port);
+        const isFileProtocol = window.location.protocol === 'file:';
+        if (isFileProtocol || (window.location.hostname === 'localhost' && isDevPort)) {
+          return 'http://localhost:8080/api/v1';
+        }
+      }
+      return '/api/v1';
+    })();
 
     // Global Fetch Interceptor untuk Otomatisasi Header Autentikasi JWT & Otorisasi RBAC
     const _nativeFetch = window.fetch;
