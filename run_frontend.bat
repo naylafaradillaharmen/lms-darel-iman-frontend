@@ -1,8 +1,16 @@
 @echo off
-title PKBM Digital Dar El Iman - Frontend SPA
+title PKBM Digital Dar El Iman - Frontend (React + Vite)
 cd /d "%~dp0"
-echo Membuka Frontend SPA PKBM Digital Dar El Iman di browser...
-start index.html
-echo Melayani via HTTP server lokal (Vite / Serve)...
-call npx -y serve -l 5173 .
+echo ========================================================
+echo   PKBM DIGITAL DAR EL IMAN - FRONTEND (REACT + VITE)
+echo   Development Server on http://localhost:5173
+echo ========================================================
+echo.
+npm run dev
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo Gagal menjalankan Vite dev server. Memastikan dependensi npm terpasang...
+    call npm install
+    npm run dev
+)
 pause
