@@ -4,9 +4,15 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+# Gunakan npm install agar dependensi biner (Rollup & ESBuild) terinstal sesuai arsitektur Linux ARM64 (aarch64)
+RUN npm install
 
 COPY . .
+
+# Build Vite SPA
+ARG VITE_API_URL=/api/v1
+ENV VITE_API_URL=$VITE_API_URL
+
 RUN npm run build
 
 # Production stage
